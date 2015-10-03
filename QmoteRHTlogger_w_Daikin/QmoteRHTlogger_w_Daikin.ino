@@ -34,7 +34,9 @@ int isOn = 0;
 #define TEMP_SETTING          24          // cooling setting to this temperature
 #define TEMP_HIGH             27.8        // restart cooling if temperature reaches this measurement
 #define TEMP_LOW              25          // stop cooling or switch to humidifier if temerature reaches this measurement
-#define TEMP_TOO_LOW          23          // if temperature reaches to this mesurement means humidifier goes too much, turn off everything
+#define TEMP_TOO_LOW          23          // if temperature reaches this value means humidifier goes too much, turn off everything
+#define TEMP_TOO_HIGH         30          // if temperature reaches this value, KEEP_OFF_TIMER will be ignored
+#define RH_TOO_HIGH           80          // if Rh reaches this value, KEEP_OFF_TIMER will be ignored
 #define RH_HIGH               68          // restart humidifier if Rh reaches to this measurement
 #define RH_LOW                60          // stop humidifier if Rh reaches to this measurement
 
@@ -414,6 +416,14 @@ qmoteCmd += just_off;
           }
         }
       } // end if(!just_off || ...)
+      else
+      {
+        if(((float) currentTemp) >= ((float) TEMP_TOO_HIGH) || currentRh >= RH_TOO_HIGH)
+        {
+          // ambient condition exceeds the limit, ignore the KEEP_OFF_TIMER
+          just_off = false;
+        }
+      }
     } // end if(currentTemp > -100 ...)
   } // end if(!qmoteDisconnected)
 
