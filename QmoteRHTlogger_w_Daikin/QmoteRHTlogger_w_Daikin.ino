@@ -382,8 +382,8 @@ delay(3000);
       
       // the following conditions will ignore the ON-OFF timer
       if(
-         (((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||                                       // heat index too high
-         (((float) currentTemp) <= ((float) TEMP_TOO_LOW)) ||                                               // temperature too low
+         (isOn == MODE_OFF && ((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||                   // heat index too high
+         (isOn != MODE_OFF && ((float) currentTemp) <= ((float) TEMP_TOO_LOW)) ||                           // temperature too low
          (isOn == MODE_COOLING && ((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW) ||      // cooling -> dehumidifier
          (isOn == MODE_DEHUMIDIFIER &&                                                                      // dehumidifier -> cooling
           ((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||
