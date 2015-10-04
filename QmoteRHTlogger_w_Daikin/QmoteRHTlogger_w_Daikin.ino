@@ -35,14 +35,13 @@ int isOn = 0;
 #define TEMP_HIGH             27.8        // restart cooling if temperature reaches this measurement
 #define TEMP_LOW              25          // stop cooling or switch to humidifier if temerature reaches this measurement
 #define TEMP_TOO_LOW          23          // if temperature reaches this value means humidifier goes too much, turn off everything
-#define TEMP_TOO_HIGH         30          // if temperature reaches this value, KEEP_OFF_TIMER will be ignored
-#define RH_TOO_HIGH           80          // if Rh reaches this value, KEEP_OFF_TIMER will be ignored
+#define HEAT_INDEX_TOO_HIGH   29.5        // use Heat Index to check if the ambient condition needs to be changed, if so, KEEP_OFF_TIMER will be ignored
 #define RH_HIGH               68          // restart humidifier if Rh reaches to this measurement
 #define RH_LOW                60          // stop humidifier if Rh reaches to this measurement
 
 // once the air conditioning is OFF due to the ambient condition reaches the criteria, 
 // do not turn it ON for certain amount of time
-#define KEEP_OFF_TIMER        70
+#define KEEP_ONOFF_TIMER      90
 
 // when Qmote is disconnected, a timer counts the time before it is reconnected back
 // if the disconnected time is longer than this value, a permanent disconnection is considered and the air conditioning will be off
@@ -60,7 +59,6 @@ bool startup_calibration = true;
 
 // Elapsed Time Control
 elapsedMillis timeElapsed;
-bool just_off = false;
 
 // Auto Shutoff Control
 elapsedMillis disconnectDurationCheck;
@@ -87,9 +85,8 @@ void setup() {
   portOne.write(qmoteCmd.c_str());
   delay(3000);
 
-  // reset timer
-  timeElapsed = 0;
-  just_off = false;
+  // skip the KEEP_ONOFF_TIMER to initiate the first mode check
+  timeElapsed = (long) KEEP_ONOFF_TIMER * (long) 60000;
 
   // send the first one
   qmoteCmd = "ATBN=0x0A,\"RhT Starts\"\r\n";      // using click combination code 0x0A
@@ -153,7 +150,7 @@ void daikin_cooling_on()
   irdaikin.daikin_sendCommand();
   isOn = MODE_COOLING;
   resend++;
-  just_off = false;
+  timeElapsed = 0;            // reset mode-switch timer
 
   // report this state change
   qmoteCmd = "ATBN=0x0A,\"cooling ON\"\r\n";      // using click combination code 0x0A, --..
@@ -178,7 +175,7 @@ void daikin_dehumidifier_on()
   irdaikin.daikin_sendCommand();
   isOn = MODE_DEHUMIDIFIER;
   resend++;
-  just_off = false;
+  timeElapsed = 0;            // reset mode-switch timer
 
   // report this state change
   qmoteCmd = "ATBN=0x0A,\"dehumidifier ON\"\r\n"; // using click combination code 0x0A, --..
@@ -203,7 +200,7 @@ void daikin_all_off()
   irdaikin.daikin_sendCommand();
   isOn = MODE_OFF;
   resend++;
-  timeElapsed = 0;            // reset keep-off timer
+  timeElapsed = 0;            // reset mode-switch timer
   // don't put just_off here to avoid startup calibration off
 
   // report this state change
@@ -227,6 +224,28 @@ void daikin_all_off()
   }
 }
 
+
+/**
+ * Heat Index Calculator
+ * Code based on Robtillaart's post on http://forum.arduino.cc/index.php?topic=107569.0
+ */
+float heatIndex(double tempC, double humidity)
+{
+ double c1 = -42.38, c2 = 2.049, c3 = 10.14, c4 = -0.2248, c5= -6.838e-3, c6=-5.482e-2, c7=1.228e-3, c8=8.528e-4, c9=-1.99e-6;
+ double T = (tempC * ((double) 9 / (double) 5)) + (double) 32;
+ double R = humidity;
+
+ double A = (( c5 * T) + c2) * T + c1;
+ double B = ((c7 * T) + c4) * T + c3;
+ double C = ((c9 * T) + c8) * T + c6;
+
+ double rv = (C * R + B) * R + A;
+ double rvC = (rv - (double) 32) * ((double) 5 / (double) 9);
+ 
+ return ((float) rvC);
+}
+
+
 void loop() {
   String qmoteCmd;
   float currentTemp;
@@ -244,29 +263,36 @@ void loop() {
   if(currentTemp > -100 && currentRh >= 0)
   {
     // get Qmote command for plaintext output
+    unsigned int currentRhInt = (unsigned int) currentRh;
+    float currentHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
+
+
+
+//debug    
 unsigned int teim = timeElapsed / (long) 60000;
-    qmoteCmd = "ATBN=0x0A,\"";      // using click combination code 0x0A
+qmoteCmd = "ATBN=0x0A,\"";      // using click combination code 0x0A
 qmoteCmd += isOn;
-qmoteCmd += qmoteDisconnected;
-qmoteCmd += just_off;
-    qmoteCmd += teim;
-    qmoteCmd += ",";
-    qmoteCmd += currentRh;
-    qmoteCmd += ",";
+qmoteCmd += teim;
+qmoteCmd += currentRhInt;
+qmoteCmd += ",";
+qmoteCmd += currentTemp;
+qmoteCmd += ",";
+qmoteCmd += currentHeatIndex;
+qmoteCmd += "\"\r\n";
+portOne.write(qmoteCmd.c_str());
+delay(3000);
+
+
+
+    qmoteCmd = "ATBN=0x0A,\"RH";      // using click combination code 0x0A, --..
+    qmoteCmd += currentRhInt;
+    qmoteCmd += ",T";
     qmoteCmd += currentTemp;
+    qmoteCmd += ",HI";
+    qmoteCmd += currentHeatIndex;
     qmoteCmd += "\"\r\n";
-
-//    qmoteCmd = "ATBN=0x0A,\"RH=";      // using click combination code 0x0A, --..
-//    qmoteCmd += currentRh;
-//    qmoteCmd += ", Temp=";
-//    qmoteCmd += currentTemp;
-//    qmoteCmd += "\"\r\n";
-
-    // output to Maker's module
-    portOne.write(qmoteCmd.c_str());
-
-    // delay before next command
-    delay(2000);
+    portOne.write(qmoteCmd.c_str());    // output to Maker's module
+    delay(2000);                        // delay before next command
 
     // get Qmote command for ThingSpeak output
     qmoteCmd = "ATBN=0x09,\"";        // using click combination code 0x09, -...
@@ -356,10 +382,24 @@ qmoteCmd += just_off;
     // filter out incorrect SHT3x reading
     if(currentTemp > -100 && currentRh >= 0)
     {
-      // once the air conditioning is OFF, keep the state for a certain amount of time
-      // because, IR control is noisy
+      // Calculate Heat Index
+      float curHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
+      
+      // check if the ambient condition exceed the limit
+      if((((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||
+         (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))
+      {
+        // ambient condition exceeds the limit, skip the KEEP_ONOFF_TIMER
+        timeElapsed = (long) KEEP_ONOFF_TIMER * (long) 60000;
+
+        // repeat the last command if the mode is not changed in the later check
+        resend = 0;
+      }
+
+      // once the air conditioning mode is switched, keep the state for a certain amount of time
+      // otherwise, it will be annoyed
       unsigned int timeElaspedInMinutes = timeElapsed / (long) 60000;
-      if(!just_off || timeElaspedInMinutes > KEEP_OFF_TIMER)
+      if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
       {
         // determine the air conditioning state
         if(isOn == MODE_OFF)
@@ -386,8 +426,7 @@ qmoteCmd += just_off;
           {
             resend = 0;
             resend_attempts = 2;
-            daikin_all_off();      
-            just_off = true;
+            daikin_all_off();
           }
           else if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW)
           {
@@ -404,8 +443,7 @@ qmoteCmd += just_off;
           {
             resend = 0;
             resend_attempts = 2;
-            daikin_all_off();      
-            just_off = true;
+            daikin_all_off();
           }
           else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
                   ((float) currentTemp >= (float) TEMP_HIGH))                             // temperature reaches high no matter how much humidity is
@@ -415,15 +453,7 @@ qmoteCmd += just_off;
             daikin_cooling_on();
           }
         }
-      } // end if(!just_off || ...)
-      else
-      {
-        if(((float) currentTemp) >= ((float) TEMP_TOO_HIGH) || currentRh >= RH_TOO_HIGH)
-        {
-          // ambient condition exceeds the limit, ignore the KEEP_OFF_TIMER
-          just_off = false;
-        }
-      }
+      } // end if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
     } // end if(currentTemp > -100 ...)
   } // end if(!qmoteDisconnected)
 
