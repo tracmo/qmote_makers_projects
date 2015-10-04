@@ -32,15 +32,14 @@ int isOn = 0;
 
 //  ambient environmental parameters
 #define TEMP_SETTING          24          // cooling setting to this temperature
-#define TEMP_HIGH             27.8        // restart cooling if temperature reaches this measurement
+#define HEAT_INDEX_HIGH       27.8        // restart cooling if temperature reaches this measurement
+#define HEAT_INDEX_TOO_HIGH   29          // use Heat Index to check if the ambient condition needs to be changed, if so, KEEP_OFF_TIMER will be ignored
 #define TEMP_LOW              25          // stop cooling or switch to humidifier if temerature reaches this measurement
 #define TEMP_TOO_LOW          23          // if temperature reaches this value means humidifier goes too much, turn off everything
-#define HEAT_INDEX_TOO_HIGH   29.5        // use Heat Index to check if the ambient condition needs to be changed, if so, KEEP_OFF_TIMER will be ignored
 #define RH_HIGH               68          // restart humidifier if Rh reaches to this measurement
 #define RH_LOW                60          // stop humidifier if Rh reaches to this measurement
 
-// once the air conditioning is OFF due to the ambient condition reaches the criteria, 
-// do not turn it ON for certain amount of time
+// avoid frequent ON-OFF mode switch
 #define KEEP_ONOFF_TIMER      90
 
 // when Qmote is disconnected, a timer counts the time before it is reconnected back
@@ -272,12 +271,8 @@ void loop() {
 unsigned int teim = timeElapsed / (long) 60000;
 qmoteCmd = "ATBN=0x0A,\"";      // using click combination code 0x0A
 qmoteCmd += isOn;
+qmoteCmd += ",";
 qmoteCmd += teim;
-qmoteCmd += currentRhInt;
-qmoteCmd += ",";
-qmoteCmd += currentTemp;
-qmoteCmd += ",";
-qmoteCmd += currentHeatIndex;
 qmoteCmd += "\"\r\n";
 portOne.write(qmoteCmd.c_str());
 delay(3000);
@@ -385,15 +380,18 @@ delay(3000);
       // Calculate Heat Index
       float curHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
       
-      // check if the ambient condition exceed the limit
-      if((((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||
-         (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))
+      // the following conditions will ignore the ON-OFF timer
+      if(
+         (((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||                                       // heat index too high
+         (((float) currentTemp) <= ((float) TEMP_TOO_LOW)) ||                                               // temperature too low
+         (isOn == MODE_COOLING && ((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW) ||      // cooling -> dehumidifier
+         (isOn == MODE_DEHUMIDIFIER &&                                                                      // dehumidifier -> cooling
+          ((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||
+           ((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)))
+        )
       {
         // ambient condition exceeds the limit, skip the KEEP_ONOFF_TIMER
         timeElapsed = (long) KEEP_ONOFF_TIMER * (long) 60000;
-
-        // repeat the last command if the mode is not changed in the later check
-        resend = 0;
       }
 
       // once the air conditioning mode is switched, keep the state for a certain amount of time
@@ -405,8 +403,8 @@ delay(3000);
         if(isOn == MODE_OFF)
         {
           // assume current air conditioning is OFF
-          // temperature priority
-          if((float) currentTemp >= (float) TEMP_HIGH)
+          // heat index (temperature) priority
+          if((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)
           {
             resend = 0;
             resend_attempts = 1;
@@ -446,7 +444,7 @@ delay(3000);
             daikin_all_off();
           }
           else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
-                  ((float) currentTemp >= (float) TEMP_HIGH))                             // temperature reaches high no matter how much humidity is
+                  ((float) curHeatIndex >= (float) HEAT_INDEX_HIGH))                      // heat index reaches high no matter how much humidity is
           {
             resend = 0;
             resend_attempts = 1;
