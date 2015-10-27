@@ -271,6 +271,7 @@ void loop() {
 unsigned int teim = timeElapsed / (long) 60000;
 qmoteCmd = "ATBN=0x0A,\"";      // using click combination code 0x0A
 qmoteCmd += isOn;
+qmoteCmd += qmoteDisconnected;
 qmoteCmd += ",";
 qmoteCmd += teim;
 qmoteCmd += "\"\r\n";
