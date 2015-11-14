@@ -23,7 +23,7 @@ SHT3X sht3x;
 // for AltSoftSerial, TX/RX pins are hard coded: RX = digital pin 8, TX = digital pin 9 on Arduino Uno
 AltSoftSerial portOne;
 String recvLine = "";
-int resend = 0;
+int resend;
 
 // Daikin Control
 IRdaikin irdaikin;
@@ -147,7 +147,6 @@ void daikin_cooling_on()
   irdaikin.daikin_sendCommand();
   isOn = MODE_COOLING;
   resend++;
-  timeElapsed = 0;            // reset mode-switch timer
 
   // report this state change
   qmoteCmd = "ATBN=0x0A,\"cooling ON\"\r\n";      // using click combination code 0x0A, --..
@@ -175,7 +174,6 @@ void daikin_dehumidifier_on()
   irdaikin.daikin_sendCommand();
   isOn = MODE_DEHUMIDIFIER;
   resend++;
-  timeElapsed = 0;            // reset mode-switch timer
 
   // report this state change
   qmoteCmd = "ATBN=0x0A,\"dehumidifier ON\"\r\n"; // using click combination code 0x0A, --..
@@ -203,7 +201,6 @@ void daikin_all_off()
   irdaikin.daikin_sendCommand();
   isOn = MODE_OFF;
   resend++;
-  timeElapsed = 0;            // reset mode-switch timer
 
   // report this state change
   qmoteCmd = "ATBN=0x0A,\"air cond OFF\"\r\n";    // using click combination code 0x0A, --..
@@ -361,7 +358,7 @@ void loop() {
     if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
     {
       // Since there is no beep now (I took off the buzzer on the air conditioning set), resend the same command every KEEP_ONOFF_TIMER in case the previous IR is missed
-      resend = RESEND_ATTEMPS - 1;
+      resend = 0;
       
       // determine the air conditioning state
       if(isOn == MODE_OFF)
@@ -374,10 +371,12 @@ void loop() {
           if(((float) currentTemp) > ((float) TEMP_HIGH))
           {
             daikin_cooling_on();
+            timeElapsed = 0;  // reset mode-switch timer
           }
           else
           {
             daikin_dehumidifier_on();
+            timeElapsed = 0;  // reset mode-switch timer
           }
         }
       }
@@ -387,10 +386,12 @@ void loop() {
         if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh <= RH_LOW)
         {
           daikin_all_off();
+          timeElapsed = 0;  // reset mode-switch timer
         }
         else if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW)
         {
           daikin_dehumidifier_on();
+          timeElapsed = 0;  // reset mode-switch timer
         }
       }
       else // MODE_DEHUMIDIFIER
@@ -400,11 +401,13 @@ void loop() {
            (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))                           // humidifier goes too far, stop the air conditioning temperarily
         {
           daikin_all_off();
+          timeElapsed = 0;  // reset mode-switch timer
         }
         else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
                 ((float) currentTemp > (float) TEMP_HIGH))                              // if high temp reached, switch to cooling
         {
           daikin_cooling_on();
+          timeElapsed = 0;  // reset mode-switch timer
         }
       }
     } // end if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
