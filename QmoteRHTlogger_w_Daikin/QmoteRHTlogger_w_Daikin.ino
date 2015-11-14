@@ -23,7 +23,7 @@ SHT3X sht3x;
 // for AltSoftSerial, TX/RX pins are hard coded: RX = digital pin 8, TX = digital pin 9 on Arduino Uno
 AltSoftSerial portOne;
 String recvLine = "";
-int resend;
+int resend = 0;
 
 // Daikin Control
 IRdaikin irdaikin;
@@ -42,6 +42,7 @@ int isOn = 0;
 // avoid frequent ON-OFF mode switch
 #define KEEP_ONOFF_TIMER      45
 #define RESEND_ATTEMPS        3
+#define RESEND_CMD_TIMER      30
 
 #define MODE_OFF              0
 #define MODE_COOLING          1
@@ -49,6 +50,7 @@ int isOn = 0;
 
 // Elapsed Time Control
 elapsedMillis timeElapsed;
+elapsedMillis resendTimer;
 
 /**
  *  Setup
@@ -67,6 +69,7 @@ void setup() {
 
   // reset the air conditioning control
   isOn = MODE_OFF;
+  resendTimer = 0;
 
   // needs no UART echo
   String qmoteCmd = "ATE0\r\n";
@@ -357,9 +360,6 @@ void loop() {
     unsigned int timeElaspedInMinutes = timeElapsed / (long) 60000;
     if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
     {
-      // Since there is no beep now (I took off the buzzer on the air conditioning set), resend the same command every KEEP_ONOFF_TIMER in case the previous IR is missed
-      resend = 0;
-      
       // determine the air conditioning state
       if(isOn == MODE_OFF)
       {
@@ -371,11 +371,13 @@ void loop() {
           if(((float) currentTemp) > ((float) TEMP_HIGH))
           {
             daikin_cooling_on();
+            resend = 0;       // reset the sending count
             timeElapsed = 0;  // reset mode-switch timer
           }
           else
           {
             daikin_dehumidifier_on();
+            resend = 0;       // reset the sending count
             timeElapsed = 0;  // reset mode-switch timer
           }
         }
@@ -386,11 +388,13 @@ void loop() {
         if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh <= RH_LOW)
         {
           daikin_all_off();
+          resend = 0;       // reset the sending count
           timeElapsed = 0;  // reset mode-switch timer
         }
         else if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW)
         {
           daikin_dehumidifier_on();
+          resend = 0;       // reset the sending count
           timeElapsed = 0;  // reset mode-switch timer
         }
       }
@@ -401,12 +405,14 @@ void loop() {
            (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))                           // humidifier goes too far, stop the air conditioning temperarily
         {
           daikin_all_off();
+          resend = 0;       // reset the sending count
           timeElapsed = 0;  // reset mode-switch timer
         }
         else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
                 ((float) currentTemp > (float) TEMP_HIGH))                              // if high temp reached, switch to cooling
         {
           daikin_cooling_on();
+          resend = 0;       // reset the sending count
           timeElapsed = 0;  // reset mode-switch timer
         }
       }
@@ -415,6 +421,15 @@ void loop() {
 
   // =================================================================================================================================
 
+  // Resend the same command every period of time in case the previous IR command is missing
+  // Note: The buzzer on the Air Conditioning Set has been removed
+  unsigned int resendTimerInMinutes = resendTimer / (long) 60000;
+  if(resendTimerInMinutes >= RESEND_CMD_TIMER)
+  {
+    resend = 0;
+    resendTimer = 0;
+  }
+  
   // delay a minutes until next reading
   delay(60000);
 
