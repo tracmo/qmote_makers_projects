@@ -65,6 +65,9 @@ void loop(void)
   float tempC;
   float rhT;
 
+  // increase tracking sequence number
+  seq_no++;
+
   // DHT11 humidity reading
   rhT = dht.readHumidity();
   
@@ -94,6 +97,8 @@ void loop(void)
   // get Qmote command for plaintext
   qmoteCmd = "ATBN=0x08,\"RhT=";      // using click combination code 0x08
   qmoteCmd += rhT;
+  qmoteCmd += "&seq=";
+  qmoteCmd += seq_no;
   qmoteCmd += "\"\r\n";
 
   // output to Maker's module
@@ -108,6 +113,8 @@ void loop(void)
   qmoteCmd = "ATBN=0x09,\"";        // using click combination code 0x09
   qmoteCmd += "field1=";
   qmoteCmd += tempC;
+  qmoteCmd += "&seq=";
+  qmoteCmd += seq_no;
   qmoteCmd += "\"\r\n";
 
   // output to Maker's module
@@ -122,6 +129,8 @@ void loop(void)
   qmoteCmd = "ATBN=0x0A,\"";        // using click combination code 0x0A
   qmoteCmd += "field2=";
   qmoteCmd += rhT;
+  qmoteCmd += "&seq=";
+  qmoteCmd += seq_no;
   qmoteCmd += "\"\r\n";
 
   // output to Maker's module
@@ -135,7 +144,7 @@ void loop(void)
   // get Qmote command for sequence test
   qmoteCmd = "ATBN=0x01,\"";
   qmoteCmd += "seq=";
-  qmoteCmd += seq_no++;
+  qmoteCmd += seq_no;
   qmoteCmd += "\"\r\n";
 
   // output to Maker's module
@@ -150,6 +159,8 @@ void loop(void)
   qmoteCmd = "ATBN=0x02,\"";
   qmoteCmd += "et=";
   qmoteCmd += timeElapsed;
+  qmoteCmd += "&seq=";
+  qmoteCmd += seq_no;
   qmoteCmd += "\"\r\n";
 
   // output to Maker's module
