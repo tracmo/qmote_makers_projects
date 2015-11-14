@@ -23,7 +23,6 @@ SHT3X sht3x;
 // for AltSoftSerial, TX/RX pins are hard coded: RX = digital pin 8, TX = digital pin 9 on Arduino Uno
 AltSoftSerial portOne;
 String recvLine = "";
-bool qmoteDisconnected = false;
 int resend = 0;
 
 // Daikin Control
@@ -32,37 +31,28 @@ int isOn = 0;
 
 //  ambient environmental parameters
 #define TEMP_SETTING          24          // cooling setting to this temperature
-#define HEAT_INDEX_HIGH       27.8        // restart cooling if temperature reaches this measurement
-#define HEAT_INDEX_TOO_HIGH   29          // use Heat Index to check if the ambient condition needs to be changed, if so, KEEP_OFF_TIMER will be ignored
+#define HEAT_INDEX_HIGH       28          // restart cooling if temperature reaches this measurement
+#define HEAT_INDEX_TOO_HIGH   30          // use Heat Index to check if the ambient condition needs to be changed, if so, KEEP_OFF_TIMER will be ignored
+#define TEMP_HIGH             26.5        // Highheat index may be caused by Rh, set High limitation to determine cooling or dehumidifier
 #define TEMP_LOW              25          // stop cooling or switch to humidifier if temerature reaches this measurement
 #define TEMP_TOO_LOW          23          // if temperature reaches this value means humidifier goes too much, turn off everything
-#define RH_HIGH               68          // restart humidifier if Rh reaches to this measurement
+#define RH_HIGH               69          // restart humidifier if Rh reaches to this measurement
 #define RH_LOW                60          // stop humidifier if Rh reaches to this measurement
 
 // avoid frequent ON-OFF mode switch
-#define KEEP_ONOFF_TIMER      90
-
-// when Qmote is disconnected, a timer counts the time before it is reconnected back
-// if the disconnected time is longer than this value, a permanent disconnection is considered and the air conditioning will be off
-#define DISCONNECT_OFF_TIMER  20
+#define KEEP_ONOFF_TIMER      45
+#define RESEND_ATTEMPS        3
 
 #define MODE_OFF              0
 #define MODE_COOLING          1
 #define MODE_DEHUMIDIFIER     2
 
-// Resending Control
-unsigned int resend_attempts = 1;
-
-// Flag for startup calibration
-bool startup_calibration = true;
-
 // Elapsed Time Control
 elapsedMillis timeElapsed;
 
-// Auto Shutoff Control
-elapsedMillis disconnectDurationCheck;
-bool disconnecting = false;
-
+/**
+ *  Setup
+ */
 void setup() {
   // Setup SHT3x
   sht3x.setAddress(SHT3X::I2C_ADDRESS_44);
@@ -77,7 +67,6 @@ void setup() {
 
   // reset the air conditioning control
   isOn = MODE_OFF;
-  disconnecting = false;
 
   // needs no UART echo
   String qmoteCmd = "ATE0\r\n";
@@ -93,11 +82,11 @@ void setup() {
 
   // delay extra 10 seconds so the first RhT information can be sent to Qmote
   delay(10000);
-
-  // when startup, issue more IR firing for direction califbration
-  startup_calibration = true;
 }
 
+/**
+ *  Flash Qmote LED
+ */
 void flash_LED()
 {
   String qmoteCmd;
@@ -113,6 +102,9 @@ void flash_LED()
   portOne.write(qmoteCmd.c_str());  
 }
 
+/**
+ *  WeMo ON
+ */
 void wemo_fan_on()
 {
   String qmoteCmd;
@@ -125,6 +117,9 @@ void wemo_fan_on()
   }  
 }
 
+/**
+ *  WeMo OFF
+ */
 void wemo_fan_off()
 {
   String qmoteCmd;
@@ -137,6 +132,9 @@ void wemo_fan_off()
   }  
 }
 
+/**
+ *  Switch to cooling mode
+ */
 void daikin_cooling_on()
 {
   String qmoteCmd;
@@ -162,6 +160,9 @@ void daikin_cooling_on()
   wemo_fan_off();
 }
 
+/**
+ *  Switch to dehumidifier mode
+ */
 void daikin_dehumidifier_on()
 {
   String qmoteCmd;
@@ -187,6 +188,9 @@ void daikin_dehumidifier_on()
   wemo_fan_off();
 }
 
+/**
+ *  Air conditioning OFF
+ */
 void daikin_all_off()
 {
   String qmoteCmd;
@@ -200,7 +204,6 @@ void daikin_all_off()
   isOn = MODE_OFF;
   resend++;
   timeElapsed = 0;            // reset mode-switch timer
-  // don't put just_off here to avoid startup calibration off
 
   // report this state change
   qmoteCmd = "ATBN=0x0A,\"air cond OFF\"\r\n";    // using click combination code 0x0A, --..
@@ -209,20 +212,9 @@ void daikin_all_off()
   // flash Qmote LED as indicator
   flash_LED();
 
-  if(!qmoteDisconnected)
-  {
-    // turn on FAN through WeMo Switch
-    wemo_fan_on();
-  }
-  else
-  {
-    // turn off FAN through WeMo Switch
-    // Note: this control is tricky. If Qmote is disconnected, this command never goes to WeMo.
-    //       the ultimate solution will be a disconnected trigger of Qmote on IFTTT.
-    wemo_fan_off();
-  }
+  // turn on FAN through WeMo Switch
+  wemo_fan_on();
 }
-
 
 /**
  * Heat Index Calculator
@@ -244,7 +236,9 @@ float heatIndex(double tempC, double humidity)
  return ((float) rvC);
 }
 
-
+/**
+ *  Main loop
+ */
 void loop() {
   String qmoteCmd;
   float currentTemp;
@@ -258,6 +252,10 @@ void loop() {
   currentTemp = sht3x.getTemperature();
   currentRh = sht3x.getHumidity();
 
+  // ---------------------------------------------------------------------------------------------------------------------------------
+  // Sending reports
+  // ---------------------------------------------------------------------------------------------------------------------------------
+
   // filter out incorrect SHT3x reading
   if(currentTemp > -100 && currentRh >= 0)
   {
@@ -265,21 +263,19 @@ void loop() {
     unsigned int currentRhInt = (unsigned int) currentRh;
     float currentHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
 
+    /*
+    //debug output
+    unsigned int teim = timeElapsed / (long) 60000;
+    qmoteCmd = "ATBN=0x0A,\"";        // using click combination code 0x0A, --..
+    qmoteCmd += isOn;
+    qmoteCmd += ",";
+    qmoteCmd += teim;
+    qmoteCmd += "\"\r\n";
+    portOne.write(qmoteCmd.c_str());
+    delay(3000);
+    */
 
-
-//debug    
-unsigned int teim = timeElapsed / (long) 60000;
-qmoteCmd = "ATBN=0x0A,\"";      // using click combination code 0x0A
-qmoteCmd += isOn;
-qmoteCmd += qmoteDisconnected;
-qmoteCmd += ",";
-qmoteCmd += teim;
-qmoteCmd += "\"\r\n";
-portOne.write(qmoteCmd.c_str());
-delay(3000);
-
-
-
+    // RhT logging in text file
     qmoteCmd = "ATBN=0x0A,\"RH";      // using click combination code 0x0A, --..
     qmoteCmd += currentRhInt;
     qmoteCmd += ",T";
@@ -301,7 +297,11 @@ delay(3000);
     portOne.write(qmoteCmd.c_str());
   }
 
-  // check Qmote Status
+  // ---------------------------------------------------------------------------------------------------------------------------------
+  // Processing incoming commands
+  // ---------------------------------------------------------------------------------------------------------------------------------
+
+  // check if Qmote has incoming notifications or commands
   while (portOne.available() > 0)
   {
     char c = portOne.read();
@@ -310,29 +310,8 @@ delay(3000);
     {
       // null terminated
       recvLine += 0x00;
-      
-      // process this line if Qmote never gets disconnected
-      if(!qmoteDisconnected)
-      {
-        if(recvLine.indexOf("ST: 0") >= 0)
-        {
-          // received "DISCONNECTED" status message
-          
-          // set the flag
-          disconnecting = true;
-          
-          // restart the timer the timer
-          disconnectDurationCheck = 0;
-        }
-        
-        if(recvLine.indexOf("ST: 1") >= 0)
-        {
-          // received "CONNECTED" status message
 
-          // uncheck the flag
-          disconnecting = false;
-        }
-      } // end if(!qmoteDisconnected)
+      // reserved for the future command processing use
       
       // clear the line
       recvLine = "";
@@ -344,143 +323,100 @@ delay(3000);
     // ignore 0x0A
   }
 
-  // check disconnecting status
-  unsigned int durationCheckInMin = disconnectDurationCheck / (long) 60000;
-  if(!qmoteDisconnected && disconnecting && durationCheckInMin > DISCONNECT_OFF_TIMER)
-  {
-    // status remained on disconnected over 3 minutes
-    
-    // set the flag, do not operate the air conditioning any more
-    qmoteDisconnected = true;
-    
-    // reset the flag to avoid short delay at the end of loop
-    disconnecting = false;
+  // =================================================================================================================================
+  // PROCEED THE ENVIRONMENT CONTROL
+  // =================================================================================================================================
 
-    // turn off air conditioning
-    resend = 0;
-    resend_attempts = 3;  // perform disconnection IR firing 3 times
-    daikin_all_off();  
-  }
+  // delay before next command and sample the data again
+  sht3x.readSample();
+  delay(2000);
   
-  // this is to prevent unattended air conditioning control
-  // once the Qmote is disconnected, no more auto air conditioning control
-  // until the next power cycle
-  if(!qmoteDisconnected)
+  // read SHT3x again
+  currentTemp = sht3x.getTemperature();
+  currentRh = sht3x.getHumidity();
+
+  // filter out incorrect SHT3x reading
+  if(currentTemp > -100 && currentRh >= 0)
   {
-    // delay before next command and sample the data again
-    sht3x.readSample();
-    delay(2000);
+    // Calculate Heat Index
+    float curHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
     
-    // read SHT3x again
-    currentTemp = sht3x.getTemperature();
-    currentRh = sht3x.getHumidity();
-
-    // filter out incorrect SHT3x reading
-    if(currentTemp > -100 && currentRh >= 0)
+    // the following conditions will ignore the ON-OFF timer
+    if(
+       (isOn == MODE_OFF && ((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||                   // heat index too high
+       (isOn != MODE_OFF && ((float) currentTemp) <= ((float) TEMP_TOO_LOW)) ||                           // temperature too low
+       (isOn == MODE_COOLING && ((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW) ||      // cooling -> dehumidifier
+       (isOn == MODE_DEHUMIDIFIER &&                                                                      // dehumidifier -> cooling
+        ((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||
+         ((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)))
+      )
     {
-      // Calculate Heat Index
-      float curHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
-      
-      // the following conditions will ignore the ON-OFF timer
-      if(
-         (isOn == MODE_OFF && ((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||                   // heat index too high
-         (isOn != MODE_OFF && ((float) currentTemp) <= ((float) TEMP_TOO_LOW)) ||                           // temperature too low
-         (isOn == MODE_COOLING && ((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW) ||      // cooling -> dehumidifier
-         (isOn == MODE_DEHUMIDIFIER &&                                                                      // dehumidifier -> cooling
-          ((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||
-           ((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)))
-        )
-      {
-        // ambient condition exceeds the limit, skip the KEEP_ONOFF_TIMER
-        timeElapsed = (long) KEEP_ONOFF_TIMER * (long) 60000;
-      }
-
-      // once the air conditioning mode is switched, keep the state for a certain amount of time
-      // otherwise, it will be annoyed
-      unsigned int timeElaspedInMinutes = timeElapsed / (long) 60000;
-      if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
-      {
-        // determine the air conditioning state
-        if(isOn == MODE_OFF)
-        {
-          // assume current air conditioning is OFF
-          // heat index (temperature) priority
-          if((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)
-          {
-            resend = 0;
-            resend_attempts = 1;
-            daikin_cooling_on();
-          }
-          else if(currentRh >= RH_HIGH)
-          {
-            resend = 0;
-            resend_attempts = 1;
-            daikin_dehumidifier_on();
-          }
-        }
-        else if(isOn == MODE_COOLING)
-        {
-          // assume current air condition in running cooling
-          if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh <= RH_LOW)
-          {
-            resend = 0;
-            resend_attempts = 2;
-            daikin_all_off();
-          }
-          else if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW)
-          {
-            resend = 0;
-            resend_attempts = 1;
-            daikin_dehumidifier_on();
-          }
-        }
-        else // MODE_DEHUMIDIFIER
-        {
-          // assume current air conditioning is running dehumidifier
-          if((((float) currentTemp) <= ((float) TEMP_LOW) && currentRh < RH_LOW) ||       // meet both criterias
-             (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))                           // humidifier goes too far, stop the air conditioning temperarily
-          {
-            resend = 0;
-            resend_attempts = 2;
-            daikin_all_off();
-          }
-          else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
-                  ((float) curHeatIndex >= (float) HEAT_INDEX_HIGH))                      // heat index reaches high no matter how much humidity is
-          {
-            resend = 0;
-            resend_attempts = 1;
-            daikin_cooling_on();
-          }
-        }
-      } // end if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
-    } // end if(currentTemp > -100 ...)
-  } // end if(!qmoteDisconnected)
-
-  // delay a minutes until next reading unless the Qmote status in in the disconnecting state
-  if(!disconnecting && !startup_calibration)
-  {
-    delay(60000);
-  }
-  else
-  {
-    delay(3000);
-  }
-
-  // if this is the first time get here, 
-  // issue more IR attempts for the IR direction calibration
-  if(startup_calibration)
-  {
-    resend_attempts = 3;
-
-    // calibration window time is up
-    if(resend >= 2)
-    {
-      startup_calibration = false;
+      // ambient condition exceeds the limit, skip the KEEP_ONOFF_TIMER
+      timeElapsed = (long) KEEP_ONOFF_TIMER * (long) 60000;
     }
-  }
+
+    // once the air conditioning mode is switched, keep the state for a certain amount of time
+    // otherwise, it will be annoyed
+    unsigned int timeElaspedInMinutes = timeElapsed / (long) 60000;
+    if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
+    {
+      // Since there is no beep now (I took off the buzzer on the air conditioning set), resend the same command every KEEP_ONOFF_TIMER in case the previous IR is missed
+      resend = RESEND_ATTEMPS - 1;
+      
+      // determine the air conditioning state
+      if(isOn == MODE_OFF)
+      {
+        // assume current air conditioning is OFF
+        // heat index (temperature) priority
+        if((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)
+        {
+          // I guess this is a Winter Mode
+          if(((float) currentTemp) > ((float) TEMP_HIGH))
+          {
+            daikin_cooling_on();
+          }
+          else
+          {
+            daikin_dehumidifier_on();
+          }
+        }
+      }
+      else if(isOn == MODE_COOLING)
+      {
+        // assume current air condition in running cooling
+        if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh <= RH_LOW)
+        {
+          daikin_all_off();
+        }
+        else if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW)
+        {
+          daikin_dehumidifier_on();
+        }
+      }
+      else // MODE_DEHUMIDIFIER
+      {
+        // assume current air conditioning is running dehumidifier
+        if((((float) currentTemp) <= ((float) TEMP_LOW) && currentRh < RH_LOW) ||       // meet both criterias
+           (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))                           // humidifier goes too far, stop the air conditioning temperarily
+        {
+          daikin_all_off();
+        }
+        else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
+                ((float) currentTemp > (float) TEMP_HIGH))                              // if high temp reached, switch to cooling
+        {
+          daikin_cooling_on();
+        }
+      }
+    } // end if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
+  } // end if(currentTemp > -100 ...)
+
+  // =================================================================================================================================
+
+  // delay a minutes until next reading
+  delay(60000);
 
   // Since IR has no feedback, multiple sends to ensure the command was received
-  if(resend < resend_attempts)
+  if(resend < RESEND_ATTEMPS)
   {
     switch(isOn)
     {
@@ -501,3 +437,4 @@ delay(3000);
     delay(5000);
   }
 }
+
