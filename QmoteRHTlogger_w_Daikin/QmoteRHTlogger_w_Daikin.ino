@@ -35,7 +35,7 @@ int isOn = 0;
 #define HEAT_INDEX_TOO_HIGH   30          // use Heat Index to check if the ambient condition needs to be changed, if so, KEEP_OFF_TIMER will be ignored
 #define TEMP_HIGH             26.5        // Highheat index may be caused by Rh, set High limitation to determine cooling or dehumidifier
 #define TEMP_LOW              25          // stop cooling or switch to humidifier if temerature reaches this measurement
-#define TEMP_TOO_LOW          23          // if temperature reaches this value means humidifier goes too much, turn off everything
+#define TEMP_TOO_LOW          23.5        // if temperature reaches this value means humidifier goes too much, turn off everything
 #define RH_HIGH               69          // restart humidifier if Rh reaches to this measurement
 #define RH_LOW                60          // stop humidifier if Rh reaches to this measurement
 
