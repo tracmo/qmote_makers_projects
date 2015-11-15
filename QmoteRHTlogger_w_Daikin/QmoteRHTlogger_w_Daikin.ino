@@ -29,6 +29,9 @@ int resend = 0;
 IRdaikin irdaikin;
 int isOn = 0;
 
+// each power cycle shall not control the air conditioning more than 12 hours
+bool stopAirCondRunning = false;
+
 //  ambient environmental parameters
 #define TEMP_SETTING          24          // cooling setting to this temperature
 #define HEAT_INDEX_HIGH       28          // restart cooling if temperature reaches this measurement
@@ -51,6 +54,7 @@ int isOn = 0;
 // Elapsed Time Control
 elapsedMillis timeElapsed;
 elapsedMillis resendTimer;
+elapsedMillis ignoranceTimer;
 
 /**
  *  Setup
@@ -70,6 +74,8 @@ void setup() {
   // reset the air conditioning control
   isOn = MODE_OFF;
   resendTimer = 0;
+  ignoranceTimer = 0;
+  stopAirCondRunning = false;
 
   // needs no UART echo
   String qmoteCmd = "ATE0\r\n";
@@ -327,97 +333,119 @@ void loop() {
   // PROCEED THE ENVIRONMENT CONTROL
   // =================================================================================================================================
 
-  // delay before next command and sample the data again
-  sht3x.readSample();
-  delay(2000);
-  
-  // read SHT3x again
-  currentTemp = sht3x.getTemperature();
-  currentRh = sht3x.getHumidity();
-
-  // filter out incorrect SHT3x reading
-  if(currentTemp > -100 && currentRh >= 0)
+  if(!stopAirCondRunning)
   {
-    // Calculate Heat Index
-    float curHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
-    
-    // the following conditions will ignore the ON-OFF timer
-    if(
-       (isOn == MODE_OFF && ((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||                   // heat index too high
-       (isOn != MODE_OFF && ((float) currentTemp) <= ((float) TEMP_TOO_LOW)) ||                           // temperature too low
-       (isOn == MODE_COOLING && ((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW) ||      // cooling -> dehumidifier
-       (isOn == MODE_DEHUMIDIFIER &&                                                                      // dehumidifier -> cooling
-        ((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||
-         ((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)))
-      )
+    // check if this power cycle has been running for more than 12 hours
+    unsigned int ignoranceTimerInMinutes = ignoranceTimer / (long) 60000;
+    if(ignoranceTimerInMinutes > 720)
     {
-      // ambient condition exceeds the limit, skip the KEEP_ONOFF_TIMER
-      timeElapsed = (long) KEEP_ONOFF_TIMER * (long) 60000;
-    }
+      // power cycle has been running for more than 12 hours, turn off the air conditioning
+      daikin_all_off();
+      resend = 0;       // reset the sending count
 
-    // once the air conditioning mode is switched, keep the state for a certain amount of time
-    // otherwise, it will be annoyed
-    unsigned int timeElaspedInMinutes = timeElapsed / (long) 60000;
-    if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
+      // no more air conditioning control
+      stopAirCondRunning = true;
+      
+      // log the status
+      qmoteCmd = "ATBN=0x0A,\"12hrs,stop AC ctrl\"\r\n";      // using click combination code 0x0A, --..
+      portOne.write(qmoteCmd.c_str());    // output to Maker's module
+      delay(2000);                        // delay before next command
+    }
+    else
     {
-      // determine the air conditioning state
-      if(isOn == MODE_OFF)
+      // delay before next command and sample the data again
+      sht3x.readSample();
+      delay(2000);
+      
+      // read SHT3x again
+      currentTemp = sht3x.getTemperature();
+      currentRh = sht3x.getHumidity();
+    
+      // filter out incorrect SHT3x reading
+      if(currentTemp > -100 && currentRh >= 0)
       {
-        // assume current air conditioning is OFF
-        // heat index (temperature) priority
-        if((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)
+        // Calculate Heat Index
+        float curHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
+        
+        // the following conditions will ignore the ON-OFF timer
+        if(
+           (isOn == MODE_OFF && ((float) curHeatIndex) >= ((float) HEAT_INDEX_TOO_HIGH)) ||                   // heat index too high
+           (isOn != MODE_OFF && ((float) currentTemp) <= ((float) TEMP_TOO_LOW)) ||                           // temperature too low
+           (isOn == MODE_COOLING && ((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW) ||      // cooling -> dehumidifier
+           (isOn == MODE_DEHUMIDIFIER &&                                                                      // dehumidifier -> cooling
+            ((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||
+             ((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)))
+          )
         {
-          // I guess this is a Winter Mode
-          if(((float) currentTemp) > ((float) TEMP_HIGH))
+          // ambient condition exceeds the limit, skip the KEEP_ONOFF_TIMER
+          timeElapsed = (long) KEEP_ONOFF_TIMER * (long) 60000;
+        }
+    
+        // once the air conditioning mode is switched, keep the state for a certain amount of time
+        // otherwise, it will be annoyed
+        unsigned int timeElaspedInMinutes = timeElapsed / (long) 60000;
+        if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
+        {
+          // determine the air conditioning state
+          if(isOn == MODE_OFF)
           {
-            daikin_cooling_on();
-            resend = 0;       // reset the sending count
-            timeElapsed = 0;  // reset mode-switch timer
+            // assume current air conditioning is OFF
+            // heat index (temperature) priority
+            if((float) curHeatIndex >= (float) HEAT_INDEX_HIGH)
+            {
+              // I guess this is a Winter Mode
+              if(((float) currentTemp) > ((float) TEMP_HIGH))
+              {
+                daikin_cooling_on();
+                resend = 0;       // reset the sending count
+                timeElapsed = 0;  // reset mode-switch timer
+              }
+              else
+              {
+                daikin_dehumidifier_on();
+                resend = 0;       // reset the sending count
+                timeElapsed = 0;  // reset mode-switch timer
+              }
+            }
           }
-          else
+          else if(isOn == MODE_COOLING)
           {
-            daikin_dehumidifier_on();
-            resend = 0;       // reset the sending count
-            timeElapsed = 0;  // reset mode-switch timer
+            // assume current air condition in running cooling
+            if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh <= RH_LOW)
+            {
+              daikin_all_off();
+              resend = 0;       // reset the sending count
+              timeElapsed = 0;  // reset mode-switch timer
+            }
+            else if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW)
+            {
+              daikin_dehumidifier_on();
+              resend = 0;       // reset the sending count
+              timeElapsed = 0;  // reset mode-switch timer
+            }
           }
-        }
-      }
-      else if(isOn == MODE_COOLING)
-      {
-        // assume current air condition in running cooling
-        if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh <= RH_LOW)
-        {
-          daikin_all_off();
-          resend = 0;       // reset the sending count
-          timeElapsed = 0;  // reset mode-switch timer
-        }
-        else if(((float) currentTemp) < ((float) TEMP_LOW) && currentRh > RH_LOW)
-        {
-          daikin_dehumidifier_on();
-          resend = 0;       // reset the sending count
-          timeElapsed = 0;  // reset mode-switch timer
-        }
-      }
-      else // MODE_DEHUMIDIFIER
-      {
-        // assume current air conditioning is running dehumidifier
-        if((((float) currentTemp) <= ((float) TEMP_LOW) && currentRh < RH_LOW) ||       // meet both criterias
-           (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))                           // humidifier goes too far, stop the air conditioning temperarily
-        {
-          daikin_all_off();
-          resend = 0;       // reset the sending count
-          timeElapsed = 0;  // reset mode-switch timer
-        }
-        else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
-                ((float) currentTemp > (float) TEMP_HIGH))                              // if high temp reached, switch to cooling
-        {
-          daikin_cooling_on();
-          resend = 0;       // reset the sending count
-          timeElapsed = 0;  // reset mode-switch timer
-        }
-      }
-    } // end if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
-  } // end if(currentTemp > -100 ...)
+          else // MODE_DEHUMIDIFIER
+          {
+            // assume current air conditioning is running dehumidifier
+            if((((float) currentTemp) <= ((float) TEMP_LOW) && currentRh < RH_LOW) ||       // meet both criterias
+               (((float) currentTemp) <= ((float) TEMP_TOO_LOW)))                           // humidifier goes too far, stop the air conditioning temperarily
+            {
+              daikin_all_off();
+              resend = 0;       // reset the sending count
+              timeElapsed = 0;  // reset mode-switch timer
+            }
+            else if((((float) currentTemp) > ((float) TEMP_LOW) && currentRh < RH_LOW) ||   // humidity reaches low but temperature is higher than low
+                    ((float) currentTemp > (float) TEMP_HIGH))                              // if high temp reached, switch to cooling
+            {
+              daikin_cooling_on();
+              resend = 0;       // reset the sending count
+              timeElapsed = 0;  // reset mode-switch timer
+            }
+          }
+        } // end if(timeElaspedInMinutes >= KEEP_ONOFF_TIMER)
+      } // end if(currentTemp > -100 ...)
+    } // end if(ignoranceTimerInMinutes > 720)-else
+  } // end if(!stopAirCondRunning)
 
   // =================================================================================================================================
 
