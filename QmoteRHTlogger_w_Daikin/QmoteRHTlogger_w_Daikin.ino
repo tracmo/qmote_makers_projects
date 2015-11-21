@@ -101,12 +101,11 @@ void flash_LED()
   String qmoteCmd;
   
   // flash Qmote LED as indicator
-  delay(2000);
   qmoteCmd = "ATL1=5\r\n";
   portOne.write(qmoteCmd.c_str());
 
   // off LED
-  delay(29000);
+  delay(3000);
   qmoteCmd = "ATL0\r\n";
   portOne.write(qmoteCmd.c_str());  
 }
