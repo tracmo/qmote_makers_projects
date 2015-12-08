@@ -136,6 +136,7 @@
             [peripheral readValueForCharacteristic:_QPS_CB_Characteristic];
             
             _click_label.text = @"Connected";
+            [self Send_CMD2_Qmote];
         }
         
         if([self compareCBUUID:service.UUID UUID2:s.UUID])
@@ -239,6 +240,22 @@
         return FALSE;
 }
 
+-(CBService *) findServiceFromUUID:(CBUUID *)UUID p:(CBPeripheral *)p {
+    for(int i = 0; i < p.services.count; i++) {
+        CBService *s = [p.services objectAtIndex:i];
+        if ([self compareCBUUID:s.UUID UUID2:UUID]) return s;
+    }
+    return nil; //Service not found on this peripheral
+}
+
+-(CBCharacteristic *) findCharacteristicFromUUID:(CBUUID *)UUID service:(CBService*)service {
+    for(int i=0; i < service.characteristics.count; i++) {
+        CBCharacteristic *c = [service.characteristics objectAtIndex:i];
+        if ([self compareCBUUID:c.UUID UUID2:UUID]) return c;
+    }
+    return nil; //Characteristic not found on this service
+}
+
 - (IBAction)connect_btn_click:(id)sender {
     
     CBUUID *s1 = [CBUUID UUIDWithString:QPS_Q1_SERVICE_UUID];
@@ -251,5 +268,28 @@
         [_CM connectPeripheral:_Qmote_p options:nil]; //Connect Qmote
     }
     
+}
+
+/* 
+ * If App want to enable long press, Qmote firmware need get a long press F-code setting.
+ * This function send a 0x06(.-.) for F_APP_DEF, it will let Qmote long press enable.
+ */
+-(void)Send_CMD2_Qmote{
+    
+    NSData* expectedData = nil;
+    unsigned char bytes[] = {0x10, 0x06, F_APP_DEF};
+    expectedData = [NSData dataWithBytes:bytes length:sizeof(bytes)];
+    
+    CBUUID *su = [CBUUID UUIDWithString:QPS_Q1_SERVICE_UUID];
+    CBUUID *cu = [CBUUID UUIDWithString:QPS_Q1_CMD_UUID];
+    CBService *service = [self findServiceFromUUID:su p:_Qmote_p];
+    CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
+
+    if(characteristic !=nil)
+        [_Qmote_p writeValue:expectedData forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
+    
+}
+
+- (IBAction)long_press:(id)sender {
 }
 @end

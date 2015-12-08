@@ -18,6 +18,7 @@
 #define QPS_Q1_CMD_UUID         @"E8009A01-4143-5453-5162-6C696E6B73EC"
 #define QPS_Q1_CB_UUID          @"E8009A02-4143-5453-5162-6C696E6B73EC"
 #define QPS_Q1_BTN_UUID         @"E8009A03-4143-5453-5162-6C696E6B73EC"
+#define F_APP_DEF           0x01
 
 @interface ViewController : UIViewController<CBCentralManagerDelegate, CBPeripheralDelegate>
 {
