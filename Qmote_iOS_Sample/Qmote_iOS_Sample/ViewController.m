@@ -174,7 +174,7 @@
     
     if([characteristic.UUID isEqual:[CBUUID UUIDWithString:QPS_Q1_BTN_UUID]]){
         [characteristic.value getBytes:&keys length:1];
-        if(keys != 0x0) //0x0 is buttone release code
+        if(keys != 0x0){ //0x0 is buttone release code
             switch (keys) {
                 case 1:
                     _click_label.text =[NSString stringWithFormat:@"Click .(%02X)", keys];
@@ -213,9 +213,8 @@
                 default:
                     break;
             }
-        
+        }
     }
-
 }
 
 -(CBCharacteristic *)findCharacteristics:(NSArray *)cs uuid:(CBUUID *)uuid
