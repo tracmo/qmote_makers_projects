@@ -38,5 +38,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *click_label;
 @property (weak, nonatomic) IBOutlet UILabel *btn_release;
 
+@property (weak, nonatomic) IBOutlet UIButton *keepalive_btn;
+- (IBAction)keepalive_touch:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIButton *fw_version_btn;
+- (IBAction)fw_version_touch:(id)sender;
+
 @end
 

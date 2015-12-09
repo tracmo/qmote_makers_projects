@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -18,33 +18,50 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B3U-RN-yUa">
-                                <rect key="frame" x="245" y="28" width="109" height="30"/>
-                                <animations/>
+                                <rect key="frame" x="245" y="50" width="109" height="30"/>
                                 <state key="normal" title="Connect Qmote"/>
                                 <connections>
                                     <action selector="connect_btn_click:" destination="BYZ-38-t0r" eventType="touchUpInside" id="j6C-Nb-NML"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Click:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wng-Gz-8OL">
-                                <rect key="frame" x="279" y="103" width="42.5" height="20.5"/>
-                                <animations/>
+                                <rect key="frame" x="278" y="125" width="43" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JgA-wK-jQV">
+                                <rect key="frame" x="264" y="189" width="73" height="30"/>
+                                <state key="normal" title="Keep-alive"/>
+                                <connections>
+                                    <action selector="keepalive_touch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="P2s-6z-5U0"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sfy-GC-WrN">
+                                <rect key="frame" x="247" y="256" width="105" height="30"/>
+                                <state key="normal" title="Get FW version"/>
+                                <connections>
+                                    <action selector="fw_version_touch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="TSJ-G3-Sho"/>
+                                </connections>
+                            </button>
                         </subviews>
-                        <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="JgA-wK-jQV" firstAttribute="top" secondItem="Wng-Gz-8OL" secondAttribute="bottom" constant="44" id="2M0-7G-zNm"/>
                             <constraint firstItem="Wng-Gz-8OL" firstAttribute="centerX" secondItem="B3U-RN-yUa" secondAttribute="centerX" id="5Nn-uC-vsW"/>
                             <constraint firstItem="Wng-Gz-8OL" firstAttribute="top" secondItem="B3U-RN-yUa" secondAttribute="bottom" constant="45" id="B2A-j7-ofL"/>
                             <constraint firstItem="B3U-RN-yUa" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="GbL-Ue-d1E"/>
-                            <constraint firstItem="B3U-RN-yUa" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="R4m-aJ-AHc"/>
+                            <constraint firstItem="B3U-RN-yUa" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="30" id="R4m-aJ-AHc"/>
+                            <constraint firstItem="JgA-wK-jQV" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="YCv-vY-92H"/>
+                            <constraint firstItem="Sfy-GC-WrN" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="cyf-FE-zEO"/>
+                            <constraint firstItem="Sfy-GC-WrN" firstAttribute="top" secondItem="JgA-wK-jQV" secondAttribute="bottom" constant="36" id="dPP-hI-gLb"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="click_label" destination="Wng-Gz-8OL" id="Uxp-Wj-bJ1"/>
                         <outlet property="connect_btn" destination="B3U-RN-yUa" id="GR9-7w-lxr"/>
+                        <outlet property="fw_version_btn" destination="Sfy-GC-WrN" id="qdn-Np-dQh"/>
+                        <outlet property="keepalive_btn" destination="JgA-wK-jQV" id="Sfl-HF-Il4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

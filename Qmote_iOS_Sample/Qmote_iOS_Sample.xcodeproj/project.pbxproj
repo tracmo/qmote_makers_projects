@@ -421,6 +421,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Qmote_iOS_Sample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-Sample";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -432,6 +433,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Qmote_iOS_Sample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-Sample";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -505,6 +507,7 @@
 				E21B7D361C167E3300B37079 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E21B7D371C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_SampleTests" */ = {
 			isa = XCConfigurationList;
@@ -513,6 +516,7 @@
 				E21B7D391C167E3300B37079 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E21B7D3A1C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_SampleUITests" */ = {
 			isa = XCConfigurationList;
@@ -521,6 +525,7 @@
 				E21B7D3C1C167E3300B37079 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

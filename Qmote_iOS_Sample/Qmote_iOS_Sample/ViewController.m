@@ -215,6 +215,21 @@
                     break;
             }
         }
+    } else if([characteristic.UUID isEqual:[CBUUID UUIDWithString:QPS_Q1_CB_UUID]]) {
+        unsigned char value[4];
+        [characteristic.value getBytes:&value length:sizeof(value)];
+        
+        /* Check first 2 bytes of return header is device info type */
+        if (value[0] == 0x06 && value[1] == 0x07) {
+            NSString *version = [[NSString alloc] initWithData:[characteristic.value subdataWithRange:NSMakeRange(2, characteristic.value.length - 2)] encoding:NSUTF8StringEncoding];
+            UIAlertView *fwversion_alert = [[UIAlertView alloc] initWithTitle:@"Qmote FW Version"
+                                                                      message:version
+                                                                     delegate:self
+                                                            cancelButtonTitle:nil
+                                                            otherButtonTitles:@"OK", nil];
+            [fwversion_alert show];
+
+        }
     }
 }
 
@@ -274,9 +289,9 @@
  * If App want to enable long press, Qmote firmware need get a long press F-code setting.
  * This function send a 0x06(.-.) for F_APP_DEF, it will let Qmote long press enable.
  */
--(void)Send_CMD2_Qmote{
+-(void)Send_CMD2_Qmote {
     
-    NSData* expectedData = nil;
+    NSData *expectedData = nil;
     unsigned char bytes[] = {0x10, 0x06, F_APP_DEF};
     expectedData = [NSData dataWithBytes:bytes length:sizeof(bytes)];
     
@@ -290,6 +305,48 @@
     
 }
 
-- (IBAction)long_press:(id)sender {
+/* Send keep-alive command to Qmote 
+ * 0x2c, 0x01:Keep alive command
+ */
+-(void)Send_keepalive_Qmote {
+    NSData *expectedData = nil;
+    unsigned char bytes[] = {0x2c, 0x01};
+    expectedData = [NSData dataWithBytes:bytes length:sizeof(bytes)];
+    
+    CBUUID *su = [CBUUID UUIDWithString:QPS_Q1_SERVICE_UUID];
+    CBUUID *cu = [CBUUID UUIDWithString:QPS_Q1_CMD_UUID];
+    CBService *service = [self findServiceFromUUID:su p:_Qmote_p];
+    CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
+    
+    if(characteristic !=nil)
+        [_Qmote_p writeValue:expectedData forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
+}
+
+/* Send a FW version request command to Qmote and your will get the callback event at didUpdateValueForCharacteristic().
+ * 0x06, 0x07:Firmware version
+ */
+-(void)Send_FWversion_Qmote {
+    NSData *expectedData = nil;
+    unsigned char bytes[] = {0x06, 0x07};
+    expectedData = [NSData dataWithBytes:bytes length:sizeof(bytes)];
+    
+    CBUUID *su = [CBUUID UUIDWithString:QPS_Q1_SERVICE_UUID];
+    CBUUID *cu = [CBUUID UUIDWithString:QPS_Q1_CMD_UUID];
+    CBService *service = [self findServiceFromUUID:su p:_Qmote_p];
+    CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
+    
+    if(characteristic !=nil)
+        [_Qmote_p writeValue:expectedData forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
+}
+
+/* User doesn't press Qmote for a few seconds, Qmote will into sleep mode to save power and Qmote will disconnect from iPhone.
+ * This keep-alive command will extend the time. If you want Qmote keep waking up, we suggest that send this command every 30 seconds to Qmote in foreground.
+ */
+- (IBAction)keepalive_touch:(id)sender {
+    [self Send_keepalive_Qmote];
+}
+
+- (IBAction)fw_version_touch:(id)sender {
+    [self Send_FWversion_Qmote];
 }
 @end
