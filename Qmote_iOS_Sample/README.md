@@ -6,7 +6,7 @@ With this app, the original Qblinks Qmote app could use at the same time, it won
 
 Before use this app, you need go to iOS system setting/bluetooth scan and pair a Qmote. If your Qmote has already paired in the list, you could ignore this note.
 
-Qmote GATT specification you could download [here](http://qblinks.com/uploads/ckeditor/attachments/20/Qblinks_Qmote_GATT_Specification_English_v1.29.pdf).
+Qmote GATT specification you could download [here](http://qblinks.com/devkit/developers/qmote-developers).
 All command codes below you could find them in this document, please read it first.
 
 ### Screenshot
