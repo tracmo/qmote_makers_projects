@@ -39,11 +39,10 @@ bool stopAirCondRunning = false;
 #define TEMP_HIGH             26.5        // Highheat index may be caused by Rh, set High limitation to determine cooling or dehumidifier
 #define TEMP_LOW              25          // stop cooling or switch to humidifier if temerature reaches this measurement
 #define TEMP_TOO_LOW          23.5        // if temperature reaches this value means humidifier goes too much, turn off everything
-#define RH_HIGH               69          // restart humidifier if Rh reaches to this measurement
 #define RH_LOW                60          // stop humidifier if Rh reaches to this measurement
 
 // avoid frequent ON-OFF mode switch
-#define KEEP_ONOFF_TIMER      45
+#define KEEP_ONOFF_TIMER      60
 #define RESEND_ATTEMPS        3
 #define RESEND_CMD_TIMER      30
 
@@ -268,18 +267,6 @@ void loop() {
     unsigned int currentRhInt = (unsigned int) currentRh;
     float currentHeatIndex = heatIndex((double) currentTemp, (double) currentRh);
 
-    /*
-    //debug output
-    unsigned int teim = timeElapsed / (long) 60000;
-    qmoteCmd = "ATBN=0x0A,\"";        // using click combination code 0x0A, --..
-    qmoteCmd += isOn;
-    qmoteCmd += ",";
-    qmoteCmd += teim;
-    qmoteCmd += "\"\r\n";
-    portOne.write(qmoteCmd.c_str());
-    delay(3000);
-    */
-
     // RhT logging in text file
     qmoteCmd = "ATBN=0x0A,\"RH";      // using click combination code 0x0A, --..
     qmoteCmd += currentRhInt;
@@ -287,15 +274,31 @@ void loop() {
     qmoteCmd += currentTemp;
     qmoteCmd += ",HI";
     qmoteCmd += currentHeatIndex;
+
+    // debug info
+    unsigned int teim = timeElapsed / (long) 60000;
+    unsigned int rtim = resendTimer / (long) 60000;
+    qmoteCmd += ",";
+    qmoteCmd += isOn;
+    qmoteCmd += ",";
+    qmoteCmd += teim;
+    qmoteCmd += ",";
+    qmoteCmd += rtim;
+    qmoteCmd += ",";
+    qmoteCmd += resend;
+    // ...................
+    
     qmoteCmd += "\"\r\n";
     portOne.write(qmoteCmd.c_str());    // output to Maker's module
     delay(2000);                        // delay before next command
 
     // get Qmote command for ThingSpeak output
-    qmoteCmd = "ATBN=0x09,\"";        // using click combination code 0x09, -...
-    qmoteCmd += currentRh;            // To save UartMsg size, leave "field1=" to IFTTT
+    qmoteCmd = "ATBN=0x09,\"field1=";   // using click combination code 0x09, -...
+    qmoteCmd += currentRh;
     qmoteCmd += "&field2=";
     qmoteCmd += currentTemp;
+    qmoteCmd += "&field3=";
+    qmoteCmd += currentHeatIndex;
     qmoteCmd += "\"\r\n";
   
     // output to Maker's module
