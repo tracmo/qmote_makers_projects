@@ -1,0 +1,533 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E21B7D0C1C167E3300B37079 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E21B7D0B1C167E3300B37079 /* main.m */; };
+		E21B7D0F1C167E3300B37079 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E21B7D0E1C167E3300B37079 /* AppDelegate.m */; };
+		E21B7D121C167E3300B37079 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E21B7D111C167E3300B37079 /* ViewController.m */; };
+		E21B7D151C167E3300B37079 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E21B7D131C167E3300B37079 /* Main.storyboard */; };
+		E21B7D171C167E3300B37079 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E21B7D161C167E3300B37079 /* Assets.xcassets */; };
+		E21B7D1A1C167E3300B37079 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E21B7D181C167E3300B37079 /* LaunchScreen.storyboard */; };
+		E21B7D251C167E3300B37079 /* Qmote_iOS_SampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E21B7D241C167E3300B37079 /* Qmote_iOS_SampleTests.m */; };
+		E21B7D301C167E3300B37079 /* Qmote_iOS_SampleUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = E21B7D2F1C167E3300B37079 /* Qmote_iOS_SampleUITests.m */; };
+		E21B7D3E1C167F6200B37079 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21B7D3D1C167F6200B37079 /* CoreBluetooth.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E21B7D211C167E3300B37079 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E21B7CFF1C167E3300B37079 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E21B7D061C167E3300B37079;
+			remoteInfo = Qmote_iOS_Sample;
+		};
+		E21B7D2C1C167E3300B37079 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E21B7CFF1C167E3300B37079 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E21B7D061C167E3300B37079;
+			remoteInfo = Qmote_iOS_Sample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		E21B7D071C167E3300B37079 /* Qmote_iOS_Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Qmote_iOS_Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E21B7D0B1C167E3300B37079 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E21B7D0D1C167E3300B37079 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		E21B7D0E1C167E3300B37079 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		E21B7D101C167E3300B37079 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		E21B7D111C167E3300B37079 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		E21B7D141C167E3300B37079 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E21B7D161C167E3300B37079 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E21B7D191C167E3300B37079 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E21B7D1B1C167E3300B37079 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E21B7D201C167E3300B37079 /* Qmote_iOS_SampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Qmote_iOS_SampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E21B7D241C167E3300B37079 /* Qmote_iOS_SampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Qmote_iOS_SampleTests.m; sourceTree = "<group>"; };
+		E21B7D261C167E3300B37079 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E21B7D2B1C167E3300B37079 /* Qmote_iOS_SampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Qmote_iOS_SampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E21B7D2F1C167E3300B37079 /* Qmote_iOS_SampleUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Qmote_iOS_SampleUITests.m; sourceTree = "<group>"; };
+		E21B7D311C167E3300B37079 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E21B7D3D1C167F6200B37079 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E21B7D041C167E3300B37079 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E21B7D3E1C167F6200B37079 /* CoreBluetooth.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E21B7D1D1C167E3300B37079 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E21B7D281C167E3300B37079 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E21B7CFE1C167E3300B37079 = {
+			isa = PBXGroup;
+			children = (
+				E21B7D3D1C167F6200B37079 /* CoreBluetooth.framework */,
+				E21B7D091C167E3300B37079 /* Qmote_iOS_Sample */,
+				E21B7D231C167E3300B37079 /* Qmote_iOS_SampleTests */,
+				E21B7D2E1C167E3300B37079 /* Qmote_iOS_SampleUITests */,
+				E21B7D081C167E3300B37079 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E21B7D081C167E3300B37079 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E21B7D071C167E3300B37079 /* Qmote_iOS_Sample.app */,
+				E21B7D201C167E3300B37079 /* Qmote_iOS_SampleTests.xctest */,
+				E21B7D2B1C167E3300B37079 /* Qmote_iOS_SampleUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E21B7D091C167E3300B37079 /* Qmote_iOS_Sample */ = {
+			isa = PBXGroup;
+			children = (
+				E21B7D0D1C167E3300B37079 /* AppDelegate.h */,
+				E21B7D0E1C167E3300B37079 /* AppDelegate.m */,
+				E21B7D101C167E3300B37079 /* ViewController.h */,
+				E21B7D111C167E3300B37079 /* ViewController.m */,
+				E21B7D131C167E3300B37079 /* Main.storyboard */,
+				E21B7D161C167E3300B37079 /* Assets.xcassets */,
+				E21B7D181C167E3300B37079 /* LaunchScreen.storyboard */,
+				E21B7D1B1C167E3300B37079 /* Info.plist */,
+				E21B7D0A1C167E3300B37079 /* Supporting Files */,
+			);
+			path = Qmote_iOS_Sample;
+			sourceTree = "<group>";
+		};
+		E21B7D0A1C167E3300B37079 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E21B7D0B1C167E3300B37079 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E21B7D231C167E3300B37079 /* Qmote_iOS_SampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				E21B7D241C167E3300B37079 /* Qmote_iOS_SampleTests.m */,
+				E21B7D261C167E3300B37079 /* Info.plist */,
+			);
+			path = Qmote_iOS_SampleTests;
+			sourceTree = "<group>";
+		};
+		E21B7D2E1C167E3300B37079 /* Qmote_iOS_SampleUITests */ = {
+			isa = PBXGroup;
+			children = (
+				E21B7D2F1C167E3300B37079 /* Qmote_iOS_SampleUITests.m */,
+				E21B7D311C167E3300B37079 /* Info.plist */,
+			);
+			path = Qmote_iOS_SampleUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E21B7D061C167E3300B37079 /* Qmote_iOS_Sample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E21B7D341C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_Sample" */;
+			buildPhases = (
+				E21B7D031C167E3300B37079 /* Sources */,
+				E21B7D041C167E3300B37079 /* Frameworks */,
+				E21B7D051C167E3300B37079 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Qmote_iOS_Sample;
+			productName = Qmote_iOS_Sample;
+			productReference = E21B7D071C167E3300B37079 /* Qmote_iOS_Sample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E21B7D1F1C167E3300B37079 /* Qmote_iOS_SampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E21B7D371C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_SampleTests" */;
+			buildPhases = (
+				E21B7D1C1C167E3300B37079 /* Sources */,
+				E21B7D1D1C167E3300B37079 /* Frameworks */,
+				E21B7D1E1C167E3300B37079 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E21B7D221C167E3300B37079 /* PBXTargetDependency */,
+			);
+			name = Qmote_iOS_SampleTests;
+			productName = Qmote_iOS_SampleTests;
+			productReference = E21B7D201C167E3300B37079 /* Qmote_iOS_SampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E21B7D2A1C167E3300B37079 /* Qmote_iOS_SampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E21B7D3A1C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_SampleUITests" */;
+			buildPhases = (
+				E21B7D271C167E3300B37079 /* Sources */,
+				E21B7D281C167E3300B37079 /* Frameworks */,
+				E21B7D291C167E3300B37079 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E21B7D2D1C167E3300B37079 /* PBXTargetDependency */,
+			);
+			name = Qmote_iOS_SampleUITests;
+			productName = Qmote_iOS_SampleUITests;
+			productReference = E21B7D2B1C167E3300B37079 /* Qmote_iOS_SampleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E21B7CFF1C167E3300B37079 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = com.qblinks;
+				TargetAttributes = {
+					E21B7D061C167E3300B37079 = {
+						CreatedOnToolsVersion = 7.1.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
+					};
+					E21B7D1F1C167E3300B37079 = {
+						CreatedOnToolsVersion = 7.1.1;
+						TestTargetID = E21B7D061C167E3300B37079;
+					};
+					E21B7D2A1C167E3300B37079 = {
+						CreatedOnToolsVersion = 7.1.1;
+						TestTargetID = E21B7D061C167E3300B37079;
+					};
+				};
+			};
+			buildConfigurationList = E21B7D021C167E3300B37079 /* Build configuration list for PBXProject "Qmote_iOS_Sample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E21B7CFE1C167E3300B37079;
+			productRefGroup = E21B7D081C167E3300B37079 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E21B7D061C167E3300B37079 /* Qmote_iOS_Sample */,
+				E21B7D1F1C167E3300B37079 /* Qmote_iOS_SampleTests */,
+				E21B7D2A1C167E3300B37079 /* Qmote_iOS_SampleUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E21B7D051C167E3300B37079 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E21B7D1A1C167E3300B37079 /* LaunchScreen.storyboard in Resources */,
+				E21B7D171C167E3300B37079 /* Assets.xcassets in Resources */,
+				E21B7D151C167E3300B37079 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E21B7D1E1C167E3300B37079 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E21B7D291C167E3300B37079 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E21B7D031C167E3300B37079 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E21B7D121C167E3300B37079 /* ViewController.m in Sources */,
+				E21B7D0F1C167E3300B37079 /* AppDelegate.m in Sources */,
+				E21B7D0C1C167E3300B37079 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E21B7D1C1C167E3300B37079 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E21B7D251C167E3300B37079 /* Qmote_iOS_SampleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E21B7D271C167E3300B37079 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E21B7D301C167E3300B37079 /* Qmote_iOS_SampleUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E21B7D221C167E3300B37079 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E21B7D061C167E3300B37079 /* Qmote_iOS_Sample */;
+			targetProxy = E21B7D211C167E3300B37079 /* PBXContainerItemProxy */;
+		};
+		E21B7D2D1C167E3300B37079 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E21B7D061C167E3300B37079 /* Qmote_iOS_Sample */;
+			targetProxy = E21B7D2C1C167E3300B37079 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E21B7D131C167E3300B37079 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E21B7D141C167E3300B37079 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		E21B7D181C167E3300B37079 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E21B7D191C167E3300B37079 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E21B7D321C167E3300B37079 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		E21B7D331C167E3300B37079 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E21B7D351C167E3300B37079 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Qmote_iOS_Sample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-Sample";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E21B7D361C167E3300B37079 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = Qmote_iOS_Sample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-Sample";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E21B7D381C167E3300B37079 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Qmote_iOS_SampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-SampleTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Qmote_iOS_Sample.app/Qmote_iOS_Sample";
+			};
+			name = Debug;
+		};
+		E21B7D391C167E3300B37079 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Qmote_iOS_SampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-SampleTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Qmote_iOS_Sample.app/Qmote_iOS_Sample";
+			};
+			name = Release;
+		};
+		E21B7D3B1C167E3300B37079 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = Qmote_iOS_SampleUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-SampleUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = Qmote_iOS_Sample;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		E21B7D3C1C167E3300B37079 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = Qmote_iOS_SampleUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.qblinks.Qmote-iOS-SampleUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = Qmote_iOS_Sample;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E21B7D021C167E3300B37079 /* Build configuration list for PBXProject "Qmote_iOS_Sample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E21B7D321C167E3300B37079 /* Debug */,
+				E21B7D331C167E3300B37079 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E21B7D341C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_Sample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E21B7D351C167E3300B37079 /* Debug */,
+				E21B7D361C167E3300B37079 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E21B7D371C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_SampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E21B7D381C167E3300B37079 /* Debug */,
+				E21B7D391C167E3300B37079 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E21B7D3A1C167E3300B37079 /* Build configuration list for PBXNativeTarget "Qmote_iOS_SampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E21B7D3B1C167E3300B37079 /* Debug */,
+				E21B7D3C1C167E3300B37079 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E21B7CFF1C167E3300B37079 /* Project object */;
+}
