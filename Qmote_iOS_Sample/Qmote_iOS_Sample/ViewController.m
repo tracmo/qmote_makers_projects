@@ -151,6 +151,15 @@
         NSLog(@"error:%@", [error description]);
 }
 
+-(void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    if(!error)
+    {
+        if([characteristic.UUID isEqual:[CBUUID UUIDWithString:QPS_Q1_CMD_UUID]])
+            NSLog(@"Write Successfully. %@", characteristic.value);
+    }
+}
+
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:
 (NSError *)error{
     
@@ -318,8 +327,16 @@
     CBService *service = [self findServiceFromUUID:su p:_Qmote_p];
     CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
     
-    if(characteristic !=nil)
+    if(characteristic !=nil) {
         [_Qmote_p writeValue:expectedData forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Message"
+                                                        message:@"Keep-alive write."
+                                                       delegate:self
+                                              cancelButtonTitle:nil
+                                              otherButtonTitles:@"OK", nil];
+        [alert show];
+    }
 }
 
 /* Send a FW version request command to Qmote and your will get the callback event at didUpdateValueForCharacteristic().
