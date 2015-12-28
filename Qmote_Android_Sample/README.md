@@ -6,8 +6,7 @@ The original Qblinks Qmote app could be used at the same time while you use this
 
 Before using this app, you need to go to Android Settings -> Bluetooth -> pair a Qmote. If your Qmote has already paired in the list, you could ignore this note.
 
-Qmote GATT specification you could download [http://qblinks.com/devkit/developers/qmote-developers](here).
-
+Qmote GATT specification you could download [here](http://qblinks.com/devkit/developers/qmote-developers).
 All command codes below you could find them in this document, please read it first.
 
 ### Screenshot
