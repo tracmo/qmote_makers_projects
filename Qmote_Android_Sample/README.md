@@ -27,4 +27,4 @@ PS. Qmote does not sense long-click until a long-click function is added. That i
 If user doesn't press the Qmote for a few seconds, the Qmote will be in sleep mode for saving power and disconnect with the Android device. This keep-alive command will extend the connection time. If you want the Qmote to stay awake, we suggest that send this command every 30 seconds to Qmote in the foreground.
 
 ### Get FW version
-This function will help you learn how would get the Qmote FW version. Send a request command to UUID_COMMAND_CHARACTERISTIC and you will get the return value at UUID_CALLBACK_CHARACTERISTI. 
+This function will help you learn how would get the Qmote FW version. Send a request command to UUID_COMMAND_CHARACTERISTIC and you will get the return value at UUID_CALLBACK_CHARACTERISTIC. 
