@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect Qmote"
+        android:id="@+id/button_connect"
+        android:layout_marginTop="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Click event"
+        android:id="@+id/click_label"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/button_connect"
+        android:layout_marginTop="60dp"
+        android:layout_above="@+id/button_keepAlive"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Keep-alive"
+        android:id="@+id/button_keepAlive"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get FW version"
+        android:id="@+id/button_FwVersion"
+        android:layout_below="@+id/button_keepAlive"
+        android:layout_alignStart="@+id/button_connect"
+        android:layout_marginTop="60dp"
+        android:layout_alignEnd="@+id/button_connect" />
+
+</RelativeLayout>
