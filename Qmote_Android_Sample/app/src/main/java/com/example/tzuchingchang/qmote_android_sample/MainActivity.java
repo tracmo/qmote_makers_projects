@@ -142,13 +142,14 @@ public class MainActivity extends Activity {
             }
         });
 
+        mTextView = (TextView)findViewById(R.id.click_label);
+
         //Display return values form callback on UI.
         mHandler = new Handler();
         mSetText =new Runnable() {
             @Override
             public void run() {
                 mHandler.postDelayed(this, 100);
-                mTextView = (TextView)findViewById(R.id.click_label);
                 mTextView.setText(clickLabel);
                 if(getVersion != null){
                     mDialog(getVersion);
@@ -230,7 +231,7 @@ public class MainActivity extends Activity {
                         gatt.setCharacteristicNotification(mCharacterCallback, true);
                         gatt.setCharacteristicNotification(mCharacterButton, true);
                         //Enable long-click.
-                        mCharacterCommand.setValue(new byte[]{0x06, 0x01});
+                        mCharacterCommand.setValue(new byte[]{0x10, 0x05, 0x02});
                         mBluetoothGatt.writeCharacteristic(mCharacterCommand);
                     }
                     else{
