@@ -79,35 +79,14 @@ public class MainActivity extends Activity {
         // Initialize a Bluetooth adapter.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
         // fire an intent to display a dialog asking the user to grant permission to enable it.
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
         }
-    }
 
-    protected void onResume() {
-        super.onResume();
-        Log.v(TAG, "onResume");
-
-        //Display return values form callback on UI.
-        mHandler = new Handler();
-        mSetText =new Runnable() {
-            @Override
-            public void run() {
-                mHandler.postDelayed(this, 100);
-                mTextView = (TextView)findViewById(R.id.click_label);
-                mTextView.setText(clickLabel);
-                if(getVersion != null){
-                    mDialog(getVersion);
-                    getVersion =null;
-                }
-            }
-        };
-
-        // This button used to get system bonded device and
+        // This button is used to get system bonded device and
         // connect on GATT if this Device determine as Qmote.
         mButtonConnect = (Button) findViewById(R.id.button_connect);
         mButtonConnect.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +116,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        //This button used for sent keep-alive command to Qmote.
+        //This button is used to sent keep-alive command to Qmote.
         //0x2c, 0x02: Keep alive command
         mButtonKeepAlive = (Button) findViewById(R.id.button_keepAlive);
         mButtonKeepAlive.setOnClickListener(new View.OnClickListener() {
@@ -150,7 +129,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        //This button used for get firmware version of this Qmote.
+        //This button is used to get firmware version of this Qmote.
         //0x06, 0x07: Firmware version.
         mButtonFwVersion = (Button) findViewById(R.id.button_FwVersion);
         mButtonFwVersion.setOnClickListener(new View.OnClickListener() {
@@ -162,6 +141,27 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+        //Display return values form callback on UI.
+        mHandler = new Handler();
+        mSetText =new Runnable() {
+            @Override
+            public void run() {
+                mHandler.postDelayed(this, 100);
+                mTextView = (TextView)findViewById(R.id.click_label);
+                mTextView.setText(clickLabel);
+                if(getVersion != null){
+                    mDialog(getVersion);
+                    getVersion =null;
+                }
+            }
+        };
+
+    }
+
+    protected void onResume() {
+        super.onResume();
+        Log.v(TAG, "onResume");
     }
 
     protected void onPause() {
@@ -188,25 +188,25 @@ public class MainActivity extends Activity {
             Log.v(TAG, "onConnectionStateChange");
 
             final BluetoothDevice qmote = gatt.getDevice();
-             if(qmote!=null){
-                 switch (newState) {
-                     case BluetoothGatt.STATE_CONNECTED:
-                         Log.v(TAG, "Connected: " + gatt.getDevice().getAddress());
-                         clickLabel = "Connected";
-                         mHandler.post(mSetText);
-                         gatt.discoverServices(); //Star to discover service of Qmote.
-                         break;
-                     case BluetoothGatt.STATE_DISCONNECTED:
-                         Log.v(TAG, "Disconnected");
-                         clickLabel = "Disconnected";
-                         mHandler.post(mSetText);
-                         break;
-                     default:
-                         Log.v(TAG, "Connection state waiting.");
-                         break;
-                        }
-                    }
+            if(qmote!=null){
+                switch (newState) {
+                    case BluetoothGatt.STATE_CONNECTED:
+                        Log.v(TAG, "Connected: " + gatt.getDevice().getAddress());
+                        clickLabel = "Connected";
+                        mHandler.post(mSetText);
+                        gatt.discoverServices(); //Star to discover service of Qmote.
+                        break;
+                    case BluetoothGatt.STATE_DISCONNECTED:
+                        Log.v(TAG, "Disconnected");
+                        clickLabel = "Disconnected";
+                        mHandler.post(mSetText);
+                        break;
+                    default:
+                        Log.v(TAG, "Connection state waiting.");
+                        break;
                 }
+            }
+        }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
@@ -230,7 +230,7 @@ public class MainActivity extends Activity {
                         gatt.setCharacteristicNotification(mCharacterCallback, true);
                         gatt.setCharacteristicNotification(mCharacterButton, true);
                         //Enable long-click.
-                        mCharacterCommand.setValue(new byte[]{0x10, 0x05, 0x02});
+                        mCharacterCommand.setValue(new byte[]{0x06, 0x01});
                         mBluetoothGatt.writeCharacteristic(mCharacterCommand);
                     }
                     else{
@@ -364,11 +364,11 @@ public class MainActivity extends Activity {
         AlertDialog.Builder builder =new AlertDialog.Builder(MainActivity.this);
         builder.setMessage(mMessage)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        }).create().show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
     }
 
 
