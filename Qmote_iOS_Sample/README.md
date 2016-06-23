@@ -4,18 +4,19 @@ This sample code will help developer integrate self app with Qmote hardware.
 In this app, you will learn how to connect, write command and read device info with Qmote.
 With this app, the original Qblinks Qmote app could use at the same time, it won't affect connection to each other.
 
-Before use this app, you need go to iOS system setting/bluetooth scan and pair a Qmote. If your Qmote has already paired in the list, you could ignore this note.
-
 Qmote GATT specification you could download [here](http://qblinks.com/devkit/developers/qmote-developers).
 All command codes below you could find them in this document, please read it first.
 
 ### Screenshot
-![App screenshot](https://github.com/qblinks/qmote_makers_projects/blob/master/Qmote_iOS_Sample/Screenshot.PNG?raw=true)
+![App screenshot](https://github.com/qblinks/qmote_makers_projects/blob/master/Qmote_iOS_Sample/Screenshot_0623.jpg?raw=true)
 
 Let's Start
 ===========
-### Connect Qmote
-This button will scan the system setting list and get the first Qmote which has already connected in system.
+### A.Scan&Connect
+This method is using for a new Qmote and doesn't connected and paired in iOS's system setting. This method will scan all Qmote which are sending discovering signal around the iPhone. Scanning method will add peripheral object into a NSMutableArray and connect the first one.
+
+### B.Connect Qmote in System
+This button will scan the system setting list and get the first Qmote which has already connected and paired in system.
 If you have many Qmote, please use a NSArray to maintain and get the specific Qmote by index number.
 
 ### Click label text
