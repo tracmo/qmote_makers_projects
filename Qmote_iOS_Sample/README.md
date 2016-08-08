@@ -28,3 +28,7 @@ If user doesn't press Qmote for a few seconds, Qmote will into sleep mode to sav
 
 ### Get FW version
 This function will help you learn how would get the Qmote FW version. Send a request command to Qmote and you will get the return value at QPS_Q1_CB_UUID characteristic. 
+
+### Keep app in background
+At some point, iOS will terminate/suspend your app in background. Apple provide a [document](https://developer.apple.com/library/ios/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/CoreBluetoothBackgroundProcessingForIOSApps/PerformingTasksWhileYourAppIsInTheBackground.html) that tell you how to wake up your app. By our testing, this method isn't stability.
+CLLocationManager provide a method that could wake up app with location update. There are example codes in Appdelegate. This will wake up your app at uniform interval. To learn more about it at Apple [document](https://developer.apple.com/library/ios/documentation/UserExperience/Conceptual/LocationAwarenessPG/CoreLocation/CoreLocation.html).
