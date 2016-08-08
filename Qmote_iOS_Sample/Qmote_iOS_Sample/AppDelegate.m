@@ -21,6 +21,19 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    _locationManager = [[CLLocationManager alloc] init];
+    _locationManager.delegate = self;
+    [_locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8) {
+        //[_locationManager requestWhenInUseAuthorization]; //Enable in foreground
+        [_locationManager requestAlwaysAuthorization]; //Enable in background
+    }
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9) {
+        _locationManager.allowsBackgroundLocationUpdates = YES;
+    }
+    
+    [_locationManager startMonitoringSignificantLocationChanges];
     return YES;
 }
 
@@ -44,6 +57,19 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+-(void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+{
+    NSLog(@"Longitude = %f", manager.location.coordinate.longitude);
+    NSLog(@"Latitude = %f", manager.location.coordinate.latitude);
+    [_locationManager stopUpdatingLocation];
+}
+
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    NSLog(@"Get location.");
+    //Do something here...
 }
 
 @end
