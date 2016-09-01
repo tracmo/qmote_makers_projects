@@ -20,6 +20,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import android.widget.TextView;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,7 +64,7 @@ public class MainActivity extends Activity {
     public static final UUID UUID_COMMAND_CHARACTERISTIC = UUID.fromString("E8009A01-4143-5453-5162-6C696E6B73EC");
     public static final UUID UUID_CALLBACK_CHARACTERISTIC = UUID.fromString("E8009A02-4143-5453-5162-6C696E6B73EC");
     public static final UUID UUID_BUTTON_CHARACTERISTIC = UUID.fromString("E8009A03-4143-5453-5162-6C696E6B73EC");
-
+    public static final UUID UUID_CLIENT_CHARACTERISTIC_CONFIG      = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +125,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Log.i(TAG, "button keepAlive");
                 if (mBluetoothGatt != null && mCharacterCommand != null) {
-                    mCharacterCommand.setValue(new byte[]{0x2c, 0x02});
+                    mCharacterCommand.setValue(new byte[]{0x2c, 0x04});
                     mBluetoothGatt.writeCharacteristic(mCharacterCommand);
                 }
             }
@@ -146,7 +148,7 @@ public class MainActivity extends Activity {
 
         //Display return values form callback on UI.
         mHandler = new Handler();
-        mSetText =new Runnable() {
+        mSetText = new Runnable() {
             @Override
             public void run() {
                 mHandler.postDelayed(this, 100);
@@ -225,14 +227,10 @@ public class MainActivity extends Activity {
                     mCharacterButton = service.getCharacteristic(UUID_BUTTON_CHARACTERISTIC);
                     mCharacterCommand = service.getCharacteristic(UUID_COMMAND_CHARACTERISTIC);
 
-                    if (mCharacterButton != null && mCharacterCallback != null) {
+                    if (mCharacterButton != null && mCharacterCallback != null && mCharacterCommand!=null) {
                         Log.v(TAG, "Initial setting of the Qmote");
-                        //Set callback notify on for getting notification from Qmote.
-                        gatt.setCharacteristicNotification(mCharacterCallback, true);
-                        gatt.setCharacteristicNotification(mCharacterButton, true);
-                        //Enable long-click.
-                        mCharacterCommand.setValue(new byte[]{0x10, 0x05, 0x02});
-                        mBluetoothGatt.writeCharacteristic(mCharacterCommand);
+                        //Set callback notify on for getting information from Qmote.
+                        setCharacteristicNotification(mBluetoothGatt, mCharacterCallback);
                     }
                     else{
                         Log.e(TAG, "Characteristic not found.");
@@ -358,7 +356,49 @@ public class MainActivity extends Activity {
             }
         }
 
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorWrite(gatt, descriptor, status);
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (descriptor.getUuid().equals(UUID_CLIENT_CHARACTERISTIC_CONFIG)) {
+                    BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
+                    if (characteristic != null && characteristic.getUuid().equals(UUID_CALLBACK_CHARACTERISTIC)) {
+                        if (Arrays.equals(descriptor.getValue(), BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)) {
+
+                            Log.i(TAG, "callback notify on - success: " + gatt.getDevice().getAddress());
+                            // set button notify on for get button click
+                            setCharacteristicNotification(gatt, mCharacterButton);
+
+                        }
+                    } else if (characteristic != null && characteristic.getUuid().equals(UUID_BUTTON_CHARACTERISTIC)) {
+                        if (Arrays.equals(descriptor.getValue(), BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)) {
+
+                            Log.i(TAG, "button notify on - success: " + gatt.getDevice().getAddress());
+                            // Enable long-click.
+                            // 0x10 set F-code, 0x05 buttonCombination, 0x01 APP define
+                            mCharacterCommand.setValue(new byte[]{0x10, 0x05, 0x01});
+                            mBluetoothGatt.writeCharacteristic(mCharacterCommand);
+                        }
+                    }
+                }
+            }
+        }
+
     };
+
+    public boolean setCharacteristicNotification(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+        if (gatt == null || characteristic == null) {
+            return false;
+        }
+
+        if (gatt.setCharacteristicNotification(characteristic, true)) {
+            final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID_CLIENT_CHARACTERISTIC_CONFIG);
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            return gatt.writeDescriptor(descriptor);
+        }
+        return false;
+    }
 
     /** Show Dialog when method mDialog used. */
     public void mDialog(String mMessage){
