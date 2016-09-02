@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015
+ * Copyright (c) 2016
  * Qblinks Corporation.
  * All rights reserved.
  *
@@ -27,12 +27,17 @@
     CBUUID *_QPS_CMD_CharacterUUID;
     CBUUID *_QPS_CB_CharacterUUID;
     CBUUID *_QPS_BTN_CharacterUUID;
+    
+    NSTimer *scan_timer;
 }
 
 @property (weak, nonatomic) IBOutlet UIButton *connect_btn;
 @property (weak, nonatomic) NSArray *Qmote_list;
 @property (strong, nonatomic) CBCentralManager *CM;
 @property (strong, nonatomic) CBPeripheral *Qmote_p;
+
+@property (strong, nonatomic) IBOutlet UIButton *scan_btn;
+- (IBAction)scan_btn_click:(id)sender;
 
 - (IBAction)connect_btn_click:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *click_label;
@@ -43,6 +48,8 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *fw_version_btn;
 - (IBAction)fw_version_touch:(id)sender;
+
+@property (strong, nonatomic) NSMutableArray *peripherals;
 
 @end
 

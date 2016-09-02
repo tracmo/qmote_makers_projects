@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015
+ * Copyright (c) 2016
  * Qblinks Corporation.
  * All rights reserved.
  *
@@ -237,7 +237,6 @@
                                                             cancelButtonTitle:nil
                                                             otherButtonTitles:@"OK", nil];
             [fwversion_alert show];
-
         }
     }
 }
@@ -280,11 +279,102 @@
     return nil; //Characteristic not found on this service
 }
 
+- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
+{
+    unsigned char manufacturerData[8] = {0};
+    NSData *Manufacturer_data = [advertisementData valueForKey: CBAdvertisementDataManufacturerDataKey];
+    
+    /* Manufacturer data doesn't complete, ignore this scan data */
+    if(!Manufacturer_data)
+    {
+        return;
+    }
+    if((unsigned long)[Manufacturer_data length]<8)
+    {
+        return;
+    }
+    
+    [Manufacturer_data getBytes:&manufacturerData range:NSMakeRange(0, 8)];
+    const char *value_char = [[Manufacturer_data description] cStringUsingEncoding: NSUTF8StringEncoding];
+    NSString* localName = [NSString stringWithFormat:@"%s" , value_char];
+    
+    if(manufacturerData[0] == 0x01 && manufacturerData[1] == 0x6b &&manufacturerData[2] == 0x51 &&manufacturerData[3] == 0x6d)//identify Qmote data.
+    {
+        NSLog(@"find Qmote - %@ %@", peripheral.name, [peripheral.identifier UUIDString]);
+    }
+    else
+    {
+        NSLog(@"NULL or not QBLINKS devices!(%@)", localName);
+        
+        return;
+    }
+    
+    if(!_peripherals) // An array store the scanning peripheral.
+    {
+        _peripherals = [[NSMutableArray alloc] initWithObjects:peripheral, nil];
+    }
+    else
+    {
+        for(int i = 0; i < self.peripherals.count; i++)
+        {
+            CBPeripheral *p = [self.peripherals objectAtIndex:i];
+            if(p.identifier == NULL || peripheral.identifier == NULL )
+            {
+                return;
+            }
+            if ([self UUIDSAreEqual:(__bridge CFUUIDRef)([p.identifier UUIDString]) u2:(__bridge CFUUIDRef)([peripheral.identifier UUIDString])])
+            {
+                [self.peripherals replaceObjectAtIndex:i withObject:peripheral]; //Duplicate UUID founded, updating object
+                
+                return;
+            }
+        }
+    }
+        
+}
+
+- (IBAction)scan_btn_click:(id)sender {
+    [_CM stopScan]; //Stop scan first.
+    
+    /* Enable a timer for scanning */
+    scan_timer = [[NSTimer alloc] init];
+    scan_timer = [NSTimer scheduledTimerWithTimeInterval:5.0f target:self selector:@selector(scan_time_selector) userInfo:nil repeats:NO];
+    
+    NSDictionary *scan_option = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:CBCentralManagerScanOptionAllowDuplicatesKey];
+    [_CM scanForPeripheralsWithServices:nil options:scan_option]; //start to scan
+    _scan_btn.titleLabel.text = @"Scanning...";
+}
+
+-(void) scan_time_selector
+{
+    /* Stop scan and timer */
+    [_CM stopScan];
+    [scan_timer invalidate];
+    _scan_btn.titleLabel.text = @"Scan done";
+    NSLog(@"Scan completely");
+    
+    for(int i = 0; i < [_peripherals count]; i++)
+    {
+        CBPeripheral *p = [_peripherals objectAtIndex:i];
+        NSLog(@"Qmote:%@", [p.identifier UUIDString]);
+    }
+
+    /* Connect the first Qmote from scanning */
+    if([_peripherals count])
+    {
+        _Qmote_p = [_peripherals objectAtIndex:0];
+        [_CM connectPeripheral:_Qmote_p options:nil];
+    }
+}
+
+/*
+ * Connect the first Qmote paired in System Setting/Bluetooth
+ */
 - (IBAction)connect_btn_click:(id)sender {
     
     CBUUID *s1 = [CBUUID UUIDWithString:QPS_Q1_SERVICE_UUID];
     NSArray *service_list = [[NSArray alloc] initWithObjects:s1, nil];
-    _Qmote_list = [_CM retrieveConnectedPeripheralsWithServices:service_list]; /* Get Qmote list connected and paired in system setting */
+    _Qmote_list = [_CM retrieveConnectedPeripheralsWithServices:service_list]; /* Get all Qmote list connected and paired in system setting */
     
     if([_Qmote_list count])
     {
@@ -365,5 +455,15 @@
 
 - (IBAction)fw_version_touch:(id)sender {
     [self Send_FWversion_Qmote];
+}
+
+- (int) UUIDSAreEqual:(CFUUIDRef)u1 u2:(CFUUIDRef)u2
+{
+    CFUUIDBytes b1 = CFUUIDGetUUIDBytes(u1);
+    CFUUIDBytes b2 = CFUUIDGetUUIDBytes(u2);
+    if (memcmp(&b1, &b2, 16) == 0)
+        return 1;
+    else
+        return 0;
 }
 @end
