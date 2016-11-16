@@ -3,7 +3,7 @@ Android Broadcast Receiver Sample APP
 
 This sample code will help developer to quick integrate your app to work with Qmote app by simply receiving the broadcast intent sent from Qblinks Qmote Android App.
 
-Since Qmote Android App **version 5.0.3**, it sends broadcast message for every Qmote activities. You can implement broadcast message receiver in your app, and your app will work with Qmote nicely.
+Since Qmote Android App **version 5.0.3**(“QmoteClick” only)/**version 5.0.4**(“QmoteClick” and “QmoteAddress”), it sends broadcast message for every Qmote activities. You can implement broadcast message receiver in your app, and your app will work with Qmote nicely.
 
 
 ###Broadcast Intent Format
