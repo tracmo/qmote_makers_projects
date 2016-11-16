@@ -8,14 +8,23 @@ Since Qmote Android App **version 5.0.3**, it sends broadcast message for every 
 
 ###Broadcast Intent Format
 
-Action Name: “QmoteCommand”
-Key:   “QmoteClick”
-Value:       “s”     as a single short click       “ss”    as short-short       “sss”   as short-short-short       “ssss”  as short-short-short-short as long-short       “ls”    as long-short-short
-       “lss”   as long-short-short-short “lsss” 
-       “lls”   as long-long-short
-       “sls”   as short-long-shortKey: “QmoteAddress”
-Value:
-      Standtard Address such as “54:4A:16:77:C9:2F”###Get Qmote List
+Action Name: “QmoteCommand”<br />
+Key:   “QmoteClick”<br />
+Value: <br />
+       “s”     as a single short click<br />
+       “ss”    as short-short<br />
+       “sss”   as short-short-short<br />
+       “ssss”  as short-short-short-short as long-short<br />
+       “ls”    as long-short-short<br />
+       “lss”   as long-short-short-short “lsss” <br />
+       “lls”   as long-long-short<br />
+       “sls”   as short-long-short<br />
+<br />
+Key: “QmoteAddress”<br />
+Value:<br />
+      Standtard Address such as “54:4A:16:77:C9:2F”<br />
+
+###Get Qmote List
 
 1. Function getQmote() will get Qmote addresses in Bluetooth system.
 Then you can know the addresses you expected to see in your receiver.
