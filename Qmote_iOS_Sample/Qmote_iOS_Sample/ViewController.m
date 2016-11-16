@@ -80,6 +80,12 @@
     [peripheral discoverServices:serviceArray];
 }
 
+#pragma mark didDisconnectPeripheral
+- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)Peripheral error:(NSError *)error
+{
+    [_CM connectPeripheral:Peripheral options:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:CBConnectPeripheralOptionNotifyOnDisconnectionKey]];
+}
+
 - (void) centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     NSLog(@"Connection failed to peripheral: %@ with UUID: %@",peripheral, [peripheral.identifier UUIDString]);
