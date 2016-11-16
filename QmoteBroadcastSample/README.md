@@ -14,9 +14,10 @@ Value: <br />
        “s”     as a single short click<br />
        “ss”    as short-short<br />
        “sss”   as short-short-short<br />
-       “ssss”  as short-short-short-short as long-short<br />
-       “ls”    as long-short-short<br />
-       “lss”   as long-short-short-short “lsss” <br />
+       “ssss”  as short-short-short-short<br />
+       “ls”    as long-shortas<br />
+       “lss”   as long-short-short<br />
+       “lsss”  as long-short-short-short<br />
        “lls”   as long-long-short<br />
        “sls”   as short-long-short<br />
 <br />
