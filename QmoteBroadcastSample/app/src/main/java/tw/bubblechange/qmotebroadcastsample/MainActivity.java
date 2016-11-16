@@ -90,7 +90,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
      * Add Qmote by “Qmote APP” first.
      *
      * This function will get Qmotes in Bluetooth system.
-     * Then you can expect which Qmote's action you may receive.
+     * Then you can know the addresses you expected to see in your receiver.
      */
     private void getQmote(){
         mQmoteList.clear();
