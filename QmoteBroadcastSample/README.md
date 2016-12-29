@@ -15,7 +15,7 @@ Value: <br />
        “ss”    as short-short<br />
        “sss”   as short-short-short<br />
        “ssss”  as short-short-short-short<br />
-       “ls”    as long-shortas<br />
+       “ls”    as long-short<br />
        “lss”   as long-short-short<br />
        “lsss”  as long-short-short-short<br />
        “lls”   as long-long-short<br />
